@@ -146,7 +146,8 @@ public class BSFCgui implements ActionListener {
 	public void setUpFrame() {
 		frame = new JFrame("BSFC Calculator");
 		frame.setLayout(new BorderLayout());
-		frame.setResizable(true);
+		frame.setResizable(false);
+		frame.getRootPane().setDefaultButton(calcButton);
 		frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
 	}
 	
