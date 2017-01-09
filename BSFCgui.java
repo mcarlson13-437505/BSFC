@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import javax.swing.*;
@@ -21,9 +19,11 @@ public class BSFCgui implements ActionListener {
 	private JLabel torqueLabel;
 	private static String torqueLabelText = "Enter torque (Nm): ";
 	private JLabel massLabel;
-	private static String massLabelText = "Mass fuel consumed (kg): ";
+	private static String massLabelText = "Mass of fuel consumed (kg): ";
 	private JLabel mpgLabel;
 	private static String mpgLabelText = "MPG for this trip: ";
+	private JLabel volumeLabel;
+	private static String volumeLabelText = "Volume of fuel consumed (gallons): ";
 	public JFormattedTextField speedField;
 	public JFormattedTextField distanceField;
 	public JFormattedTextField rpmField;
@@ -31,6 +31,7 @@ public class BSFCgui implements ActionListener {
 	public JFormattedTextField torqueField;
 	public JFormattedTextField massField;
 	public JFormattedTextField mpgField;
+	public JFormattedTextField volumeField;
 	private NumberFormat speedFormat;
 	private NumberFormat rpmFormat;
 	private NumberFormat bsfcFormat;
@@ -38,6 +39,7 @@ public class BSFCgui implements ActionListener {
 	private NumberFormat massFormat;
 	private NumberFormat distanceFormat;
 	private NumberFormat mpgFormat;
+	private NumberFormat volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
 
@@ -67,6 +69,7 @@ public class BSFCgui implements ActionListener {
 		massFormat = NumberFormat.getNumberInstance();
 		distanceFormat = NumberFormat.getNumberInstance();
 		mpgFormat = NumberFormat.getNumberInstance();
+		volumeFormat = NumberFormat.getNumberInstance();
 	}
 
 	/*
@@ -80,6 +83,7 @@ public class BSFCgui implements ActionListener {
         labelPane.add(bsfcLabel);
         labelPane.add(distanceLabel);
         labelPane.add(massLabel);
+        labelPane.add(volumeLabel);
         labelPane.add(mpgLabel);
         JPanel fieldPane = new JPanel(new GridLayout(0,1));
         fieldPane.add(speedField);
@@ -88,6 +92,7 @@ public class BSFCgui implements ActionListener {
         fieldPane.add(bsfcField);
         fieldPane.add(distanceField);
         fieldPane.add(massField);
+        fieldPane.add(volumeField);
         fieldPane.add(mpgField);
         frame.add(labelPane, BorderLayout.CENTER);
         frame.add(fieldPane, BorderLayout.LINE_END);
@@ -116,6 +121,7 @@ public class BSFCgui implements ActionListener {
 		bsfcLabel = new JLabel(bsfcLabelText);
 		torqueLabel = new JLabel(torqueLabelText);
 		massLabel = new JLabel(massLabelText);
+		volumeLabel = new JLabel(volumeLabelText);
 		mpgLabel = new JLabel(mpgLabelText);
 	}
 
@@ -129,6 +135,8 @@ public class BSFCgui implements ActionListener {
 		bsfcLabel.setLabelFor(bsfcField);
 		torqueLabel.setLabelFor(torqueField);
 		massLabel.setLabelFor(massField);
+		volumeLabel.setLabelFor(volumeField);
+		mpgLabel.setLabelFor(mpgField);
 	}
 	
 	/*
@@ -169,6 +177,10 @@ public class BSFCgui implements ActionListener {
 		massField.setColumns(10);
 		massField.setEditable(false);
 		massField.setForeground(Color.RED);
+		volumeField = new JFormattedTextField(volumeFormat);
+		volumeField.setColumns(10);
+		volumeField.setEditable(false);
+		volumeField.setForeground(Color.RED);
 		mpgField = new JFormattedTextField(mpgFormat);
 		mpgField.setColumns(10);
 		mpgField.setEditable(false);
@@ -200,6 +212,7 @@ public class BSFCgui implements ActionListener {
 	 * re-launches the program with blank fields
 	 */
 	private void clearButtonAction() {
+		@SuppressWarnings("unused")
 		BSFCgui gui = new BSFCgui();
 	}
 	
@@ -213,9 +226,17 @@ public class BSFCgui implements ActionListener {
     	double bsfc = (long) bsfcField.getValue();
     	double torque = (long) torqueField.getValue();
 		double massConsumed = calculateMass(speed, distance, rpm, bsfc, torque);
+		double volumeConsumed = calculateVolume(massConsumed);
 		double mpg = calculateMPG(massConsumed, distance);
 		massField.setValue(massConsumed);
+		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
+	}
+
+	private double calculateVolume(double massConsumed) {
+		double poundMass = massConsumed * 2.20462; //kg to lb
+		double volume = poundMass/6.94; //in gallons, 6.94 = density diesel fuel (lb/gal)
+		return volume;
 	}
 
 	/*
@@ -244,6 +265,7 @@ public class BSFCgui implements ActionListener {
 	}
 	
 	public static void main(String[] args) {
+		@SuppressWarnings("unused")
 		BSFCgui gui = new BSFCgui();
 	}
 }
