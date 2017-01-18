@@ -1,7 +1,15 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.text.NumberFormat;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import javax.swing.*;
 
@@ -42,6 +50,7 @@ public class BSFCgui implements ActionListener {
 	private NumberFormat volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
+
 
 	/*
 	 * constructor
@@ -221,6 +230,9 @@ public class BSFCgui implements ActionListener {
 	 * grabs values from text fields and calls the two calculate methods
 	 */
 	private void calcButtonAction() {
+		/* 
+		 * make it so the program parses the csv file based on bsfc and rpm value
+		 */
 		double speed = (long) speedField.getValue();
     	double distance = (long) distanceField.getValue();
     	double rpm = (long) rpmField.getValue();
@@ -232,8 +244,12 @@ public class BSFCgui implements ActionListener {
 		massField.setValue(massConsumed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
+		velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
+	/*
+	 * calculates volume of fuel consumed
+	 */
 	private double calculateVolume(double massConsumed) {
 		double poundMass = massConsumed * 2.20462; //kg to lb
 		double volume = poundMass/6.94; //in gallons, 6.94 = density diesel fuel (lb/gal)
@@ -264,6 +280,64 @@ public class BSFCgui implements ActionListener {
 		mass = mass/1000;
 		return mass;
 	}
+	
+	
+	
+	/*
+	 * loop to calculate mass and velocities
+	 */
+	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
+		double wcruise = 0;
+		double Tcruise = 0;
+		double massVehicle = 1060.045; //(kg)
+		double velocityOld = 0;
+		double velocity;
+		double Dt = .25;
+		double Dmass = (BSFC)*w*T*Dt;
+		double Dvelocity = (w*T - (wcruise*Tcruise))/massVehicle*velocityVehicle;
+		double velocityNew = velocityOld + Dvelocity;
+		double dist = 0;// = SUM(velocity*Dt);
+		//use dist to end loop
+		while(dist != distance) {
+			
+		}
+	}
+	
+	/*
+	 * write data to csv file
+	 */
+//	private void writeToCSV() {
+//		CSVWriter writer;
+//		try {
+//			writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream("data/personData.csv"), "UTF-8"));
+//			for (Person person : personMap.values()) {
+//				writer.writeNext(person.toInfoArray());
+//			}
+//			writer.close();
+//		} catch (IOException e) {
+//			System.err.println("Error saving persons");
+//		}
+//	}
+	
+	/*
+	 * read data from csv file
+	 */
+//	private void readFromCSV() {
+//		CSVReader reader;
+//		try {
+//			reader = new CSVReader(new InputStreamReader(new FileInputStream("data/personData.csv"), "UTF-8"));
+//			List<String[]> myRows = reader.readAll();
+//			for (String[] row : myRows) {
+//				Person person = new Person(row);
+//				addPerson(person);
+//				addID(person.getID());
+//			}
+//		} catch (FileNotFoundException e) {
+//			System.err.println("Error loading persons");
+//		} catch (IOException e) {
+//			System.err.println("Error loading persons");
+//		}
+//	}
 	
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
