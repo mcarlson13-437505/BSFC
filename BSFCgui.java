@@ -287,19 +287,26 @@ public class BSFCgui implements ActionListener {
 	 * loop to calculate mass and velocities
 	 */
 	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
-		double wcruise = 0;
-		double Tcruise = 0;
+		double wcruise = 0;	//get these from csv
+		double Tcruise = 0; //get these from csv
 		double massVehicle = 1060.045; //(kg)
 		double velocityOld = 0;
 		double velocity;
 		double Dt = .25;
-		double Dmass = (BSFC)*w*T*Dt;
-		double Dvelocity = (w*T - (wcruise*Tcruise))/massVehicle*velocityVehicle;
-		double velocityNew = velocityOld + Dvelocity;
-		double dist = 0;// = SUM(velocity*Dt);
+		double Dmass;
+		double Dvelocity;
+		double velocityNew;
+		double dist = 0;
 		//use dist to end loop
 		while(dist != distance) {
-			
+			Dmass = (BSFC)*w*T*Dt;
+			Dvelocity = (w*T - (wcruise*Tcruise))/(massVehicle*velocityVehicle);
+			velocityNew  = velocityOld + Dvelocity;
+			velocityOld = velocityNew;
+			System.out.println(Dvelocity);
+			System.out.println(velocityNew);
+			System.out.println(velocityOld);
+			dist = velocityVehicle * Dt; // = SUM(velocity*Dt);
 		}
 	}
 	
