@@ -1,15 +1,20 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.text.NumberFormat;
-import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+//import com.opencsv.CSVReader;
+//import com.opencsv.CSVWriter;
 
 import javax.swing.*;
 
@@ -50,12 +55,11 @@ public class BSFCgui implements ActionListener {
 	private NumberFormat volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
-
-
+	private Map<Integer, Integer> rpmMap;
 	/*
 	 * constructor
 	 */
-	public BSFCgui() {
+	public BSFCgui() throws FileNotFoundException {
 		setUpFrame();
 		createLabels();
 		pairLabelsAndFields();
@@ -65,6 +69,7 @@ public class BSFCgui implements ActionListener {
 		addButtonsToFrame();
 		displayFrame();
 		addActionListeners();
+//		scannerTest();
 	}
 	
 	/*
@@ -214,14 +219,19 @@ public class BSFCgui implements ActionListener {
 		if(source.equals(calcButton)) {
 			calcButtonAction();
 		} else {
-			clearButtonAction();
+			try {
+				frame.setVisible(false);
+				clearButtonAction();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/*
 	 * re-launches the program with blank fields
 	 */
-	private void clearButtonAction() {
+	private void clearButtonAction() throws FileNotFoundException {
 		@SuppressWarnings("unused")
 		BSFCgui gui = new BSFCgui();
 	}
@@ -244,7 +254,7 @@ public class BSFCgui implements ActionListener {
 		massField.setValue(massConsumed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
-		velocityLoop(distance, rpm, torque, bsfc, speed);
+//		velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
 	/*
@@ -286,67 +296,88 @@ public class BSFCgui implements ActionListener {
 	/*
 	 * loop to calculate mass and velocities
 	 */
-	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
-		double wcruise = 0;	//get these from csv
-		double Tcruise = 0; //get these from csv
-		double massVehicle = 1060.045; //(kg)
-		double velocityOld = 0;
-		double velocity;
-		double Dt = .25;
-		double Dmass;
-		double Dvelocity;
-		double velocityNew;
-		double dist = 0;
-		//use dist to end loop
-		while(dist != distance) {
-			Dmass = (BSFC)*w*T*Dt;
-			Dvelocity = (w*T - (wcruise*Tcruise))/(massVehicle*velocityVehicle);
-			velocityNew  = velocityOld + Dvelocity;
-			velocityOld = velocityNew;
-			System.out.println(Dvelocity);
-			System.out.println(velocityNew);
-			System.out.println(velocityOld);
-			dist = velocityVehicle * Dt; // = SUM(velocity*Dt);
-		}
-	}
+//	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
+//		double wcruise = 0;	//get these from csv
+//		double Tcruise = 0; //get these from csv
+//		double massVehicle = 1060.045; //(kg)
+//		double velocityOld = 0;
+//		double velocity;
+//		double Dt = .25;
+//		double Dmass;
+//		double Dvelocity;
+//		double velocityNew;
+//		double dist = 0;
+//		//use dist to end loop
+//		while(dist != distance) {
+//			Dmass = (BSFC)*w*T*Dt;
+//			Dvelocity = (w*T - (wcruise*Tcruise))/(massVehicle*velocityVehicle);
+//			velocityNew  = velocityOld + Dvelocity;
+//			velocityOld = velocityNew;
+//			System.out.println(Dvelocity);
+//			System.out.println(velocityNew);
+//			System.out.println(velocityOld);
+//			dist = velocityVehicle * Dt; // = SUM(velocity*Dt);
+//		}
+//	}
 	
 	/*
 	 * write data to csv file
 	 */
-//	private void writeToCSV() {
+//	private <CSVWriter> void writeToCSV() {
 //		CSVWriter writer;
 //		try {
-//			writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream("data/personData.csv"), "UTF-8"));
+//			writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream("Desktop/sparkDrivingData.csv"), "UTF-8"));
 //			for (Person person : personMap.values()) {
 //				writer.writeNext(person.toInfoArray());
 //			}
-//			writer.close();
+//			((FileInputStream) writer).close();
 //		} catch (IOException e) {
-//			System.err.println("Error saving persons");
+//			System.err.println("Error saving data");
 //		}
 //	}
-	
-	/*
-	 * read data from csv file
-	 */
-//	private void readFromCSV() {
+//	
+//	/*
+//	 * read data from csv file
+//	 */
+//	private <CSVReader> void readFromCSV() {
 //		CSVReader reader;
 //		try {
-//			reader = new CSVReader(new InputStreamReader(new FileInputStream("data/personData.csv"), "UTF-8"));
+//			reader = new CSVReader(new InputStreamReader(new FileInputStream("Desktop/sparkDrivingData.csv"), "UTF-8"));
 //			List<String[]> myRows = reader.readAll();
 //			for (String[] row : myRows) {
 //				Person person = new Person(row);
-//				addPerson(person);
-//				addID(person.getID());
+//				
 //			}
 //		} catch (FileNotFoundException e) {
-//			System.err.println("Error loading persons");
+//			System.err.println("Error loading data");
 //		} catch (IOException e) {
-//			System.err.println("Error loading persons");
+//			System.err.println("Error loading data");
 //		}
 //	}
 	
-	public static void main(String[] args) {
+	//TODO: grab RPM/LOD from csv and convert to torque
+	//TODO: use those numbers to calculate BSFC
+	
+	/*
+	 * scanner test
+	 */
+//	private void scannerTest() throws FileNotFoundException {
+//		System.out.println(".");
+//        Scanner scanner = new Scanner(new File("data/sparkDrivingData.csv"));
+//        scanner.useDelimiter(",");
+//        rpmMap = new HashMap<>();
+//        int rpm = scanner.nextInt();
+//        int mph = 0;
+//		while(scanner.hasNext()){
+//            rpmMap.put(rpm, mph);
+//            rpmMap.toString();
+//            System.out.println(rpmMap);
+//            scanner.nextLine();
+//        }
+//        scanner.close();
+//	}
+	
+	public static void main(String[] args) throws FileNotFoundException {
 		@SuppressWarnings("unused")
 		BSFCgui gui = new BSFCgui();
 	}
