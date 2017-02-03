@@ -254,7 +254,8 @@ public class BSFCgui implements ActionListener {
 		massField.setValue(massConsumed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
-//		velocityLoop(distance, rpm, torque, bsfc, speed);
+		speed = speed*0.44704; //mph to m/s
+		velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
 	/*
@@ -296,29 +297,32 @@ public class BSFCgui implements ActionListener {
 	/*
 	 * loop to calculate mass and velocities
 	 */
-//	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
-//		double wcruise = 0;	//get these from csv
-//		double Tcruise = 0; //get these from csv
-//		double massVehicle = 1060.045; //(kg)
-//		double velocityOld = 0;
-//		double velocity;
-//		double Dt = .25;
-//		double Dmass;
-//		double Dvelocity;
-//		double velocityNew;
-//		double dist = 0;
-//		//use dist to end loop
-//		while(dist != distance) {
-//			Dmass = (BSFC)*w*T*Dt;
-//			Dvelocity = (w*T - (wcruise*Tcruise))/(massVehicle*velocityVehicle);
-//			velocityNew  = velocityOld + Dvelocity;
-//			velocityOld = velocityNew;
-//			System.out.println(Dvelocity);
-//			System.out.println(velocityNew);
-//			System.out.println(velocityOld);
-//			dist = velocityVehicle * Dt; // = SUM(velocity*Dt);
-//		}
-//	}
+	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
+		double wcruise = 0;	//get these from csv
+		double Tcruise = 0; //get these from csv
+		double massVehicle = 1060.045; //(kg)
+		double velocityOld = 30*0.44704;
+		double Dt = .25;
+		double Dvelocity;
+		double velocityNew;
+		double dist = 0;
+
+		System.out.println("Dist: " + dist);
+		System.out.println("Velocity old: " + velocityOld);
+
+		while(dist < distance) {
+			Dvelocity = (w*T - (wcruise*Tcruise))/(massVehicle*velocityVehicle);
+			System.out.println("Velocity old: " + velocityOld);
+			velocityNew  = velocityOld + Dvelocity;
+			velocityOld = velocityNew;
+			System.out.println("D velocity: " + Dvelocity);
+			System.out.println("Velocity new: " + velocityNew);
+			dist = dist + velocityVehicle * Dt; // = SUM(velocity*Dt);
+			System.out.println("dist: " + dist + "\n");
+			w++;
+			T++;
+		}
+	}
 	
 	/*
 	 * write data to csv file
