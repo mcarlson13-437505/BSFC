@@ -1,22 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.TreeMap;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-//import com.opencsv.CSVReader;
-//import com.opencsv.CSVWriter;
-import java.lang.reflect.Array;
-
 import javax.swing.*;
 
 public class BSFCgui implements ActionListener {
@@ -26,12 +11,6 @@ public class BSFCgui implements ActionListener {
 	private static String speedLabelText = "Enter Average Speed (MPH): ";
 	private JLabel distanceLabel;
 	private static String distanceLabelText = "Enter Distance travelled (mi): ";
-	private JLabel rpmLabel;
-	private static String rpmLabelText = "Enter vehicle RPM: ";
-	private JLabel bsfcLabel;
-	private static String bsfcLabelText = "Enter BSFC value (g/kwHr): ";
-	private JLabel torqueLabel;
-	private static String torqueLabelText = "Enter torque (Nm): ";
 	private JLabel massLabel;
 	private static String massLabelText = "Mass of fuel consumed (kg): ";
 	private JLabel mpgLabel;
@@ -40,28 +19,21 @@ public class BSFCgui implements ActionListener {
 	private static String volumeLabelText = "Volume of fuel consumed (gallons): ";
 	public JFormattedTextField speedField;
 	public JFormattedTextField distanceField;
-	public JFormattedTextField rpmField;
-	public JFormattedTextField bsfcField;
-	public JFormattedTextField torqueField;
 	public JFormattedTextField massField;
 	public JFormattedTextField mpgField;
 	public JFormattedTextField volumeField;
 	private NumberFormat speedFormat;
-	private NumberFormat rpmFormat;
-	private NumberFormat bsfcFormat;
-	private NumberFormat torqueFormat;
 	private NumberFormat massFormat;
 	private NumberFormat distanceFormat;
 	private NumberFormat mpgFormat;
 	private NumberFormat volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
-	private Map<Integer, Integer> rpmMap;
 
 	/*
 	 * constructor
 	 */
-	public BSFCgui() throws FileNotFoundException {
+	public BSFCgui() {
 		setUpFrame();
 		createLabels();
 		pairLabelsAndFields();
@@ -74,9 +46,32 @@ public class BSFCgui implements ActionListener {
 	}
 
 	/*
-	 * next 3 methods contain and search arrays for RPM, Torque, and BSFC
+	 * grab values in order to calculate
 	 */
-	private void rpmArray() { // 146 total items
+	private void valueGrabber() {
+		int[] speedArray = { 37, 35, 35, 43, 42, 33, 35, 35, 58, 47, 32, 30, 51, 34, 43, 34, 37, 34, 41, 42, 35, 33, 31,
+				43, 34, 29, 25, 35, 35, 29, 31, 36, 25, 39, 35, 23, 34, 29, 35, 20, 35, 35, 19, 40, 33, 47, 27, 1, 17,
+				18, 32, 34, 33, 35, 34, 21, 34, 53, 45, 35, 35, 35, 35, 1, 48, 19, 1, 34, 34, 27, 1, 1, 35, 35, 35, 35,
+				34, 34, 39, 34, 32, 40, 53, 34, 35, 34, 32, 32, 30, 35, 35, 43, 31, 50, 45, 35, 47, 34, 53, 36, 37, 53,
+				45, 53, 29, 27, 35, 47, 35, 36, 44, 8, 7, 6, 35, 37, 50, 37, 45, 20, 20, 20, 42, 27, 1, 17, 34, 1, 27,
+				13, 32, 51, 11, 32, 18, 10, 34, 33, 30, 39, 35, 11, 35, 35, 34 };
+		double speed = (long) speedField.getValue();
+		int index = 0;
+		double upper = speed + (speed * .05);
+		double lower = speed - (speed * .05);
+		while(index < 145) {
+			if (speedArray[index] == speed) {
+				index = 146;
+			} else if (speedArray[index] < upper && speedArray[index] > lower) {
+				speed = (speed + ((upper + lower) / 2));
+			} else if (speedArray[index] < upper) {
+				speed = (speed + ((upper + speed) / 2));
+			} else if (speedArray[index] > lower) {
+				speed = (speed + ((lower + speed) / 2));
+			}
+			index++;
+		}
+		
 		int[] rpmArray = { 1703, 2059, 1668, 2079, 1970, 1674, 2783, 1761, 2762, 2270, 1527, 1193, 2449, 1658, 2433,
 				1600, 1812, 1455, 1933, 1961, 1386, 1610, 1312, 2106, 1608, 1372, 1143, 2033, 1109, 1121, 1512, 1130,
 				1487, 1836, 1229, 1512, 1639, 819, 1639, 1184, 1701, 1635, 1008, 1936, 1576, 2197, 1669, 673, 995, 965,
@@ -86,10 +81,8 @@ public class BSFCgui implements ActionListener {
 				2530, 2117, 2550, 1737, 1886, 1984, 2275, 1666, 1700, 2105, 1300, 1496, 1830, 1656, 2176, 2355, 2134,
 				2090, 2061, 2076, 2507, 2076, 1724, 694, 2061, 2176, 700, 1692, 2246, 2502, 2500, 2001, 1594, 1760,
 				1890, 1555, 1563, 1725, 1948, 1701, 2431, 1625, 1867, 1972 };
-		// search algorithm
-	}
+		int rpm = rpmArray[index];
 
-	private void torqueArray() { // 146 total items
 		double[] torqueArray = { 13.34124863, 13.34124863, 13.34124863, 13.34124863, 14.45301935, 15.56479007,
 				15.56479007, 15.56479007, 15.56479007, 16.67656079, 17.7883315, 17.7883315, 17.7883315, 18.90010222,
 				18.90010222, 18.90010222, 18.90010222, 18.90010222, 20.01187294, 20.01187294, 20.01187294, 21.12364366,
@@ -109,10 +102,8 @@ public class BSFCgui implements ActionListener {
 				97.83582327, 100.0593647, 100.0593647, 101.1711354, 102.2829061, 102.2829061, 102.2829061, 103.3946769,
 				104.5064476, 104.5064476, 104.5064476, 105.6182183, 106.729989, 106.729989, 106.729989, 106.729989,
 				108.9535305, 108.9535305, 110.0653012, 110.0653012 };
-		// search algorithm
-	}
+		double torque = torqueArray[index];
 
-	private void bsfcArray() { // 146 total items
 		double[] bsfcArray = { 981.1239144, 2558.746305, 418.0431635, 343.806749, 489.1955478, 287.940403, 510.6226268,
 				1972.57751, 744.5678257, 278.7559509, 310.8419848, 309.7035376, 4.232277366, 402.263044, 3.380571601,
 				298.8411414, 3.905775914, 527.0361828, 235.0504977, 445.1933793, 367.8577462, 3.507899774, 346.0542332,
@@ -132,7 +123,21 @@ public class BSFCgui implements ActionListener {
 				322.5586923, 516.0939077, 79.29803116, 314.7035908, 383.0558685, 329.205822, 291.1977361, 284.5858242,
 				72.78887319, 261.4457486, 315.751814, 278.2402068, 316.6775381, 305.4363554, 0.6969557593, 208.505942,
 				288.1417599, 360.0490781, 234.9573586 };
-		// search algorithm
+
+		double bsfc = bsfcArray[index];
+		double distance = (long) distanceField.getValue();
+		double massConsumed = calculateMass(speed, distance, rpm, bsfc, torque);
+		double volumeConsumed = calculateVolume(massConsumed);
+		double mpg = calculateMPG(massConsumed, distance);
+		System.out.println("Mass consumed: " +  massConsumed);
+		System.out.println("Volume consumed: " + volumeConsumed);
+		System.out.println("MPG: " + mpg);
+		massField.setValue(massConsumed);
+		volumeField.setValue(volumeConsumed);
+		mpgField.setValue(mpg);
+		
+		//speed = speed * 0.44704; // mph to m/s
+		// velocityLoop(distance, rpm, torque, bsfc, speed);	
 	}
 
 	/*
@@ -140,9 +145,6 @@ public class BSFCgui implements ActionListener {
 	 */
 	private void setUpFormats() {
 		speedFormat = NumberFormat.getNumberInstance();
-		rpmFormat = NumberFormat.getNumberInstance();
-		bsfcFormat = NumberFormat.getNumberInstance();
-		torqueFormat = NumberFormat.getNumberInstance();
 		massFormat = NumberFormat.getNumberInstance();
 		distanceFormat = NumberFormat.getNumberInstance();
 		mpgFormat = NumberFormat.getNumberInstance();
@@ -155,18 +157,12 @@ public class BSFCgui implements ActionListener {
 	private void addPanelToFrame() {
 		JPanel labelPane = new JPanel(new GridLayout(0, 1));
 		labelPane.add(speedLabel);
-		labelPane.add(rpmLabel);
-		labelPane.add(torqueLabel);
-		labelPane.add(bsfcLabel);
 		labelPane.add(distanceLabel);
 		labelPane.add(massLabel);
 		labelPane.add(volumeLabel);
 		labelPane.add(mpgLabel);
 		JPanel fieldPane = new JPanel(new GridLayout(0, 1));
 		fieldPane.add(speedField);
-		fieldPane.add(rpmField);
-		fieldPane.add(torqueField);
-		fieldPane.add(bsfcField);
 		fieldPane.add(distanceField);
 		fieldPane.add(massField);
 		fieldPane.add(volumeField);
@@ -194,9 +190,6 @@ public class BSFCgui implements ActionListener {
 	private void createLabels() {
 		speedLabel = new JLabel(speedLabelText);
 		distanceLabel = new JLabel(distanceLabelText);
-		rpmLabel = new JLabel(rpmLabelText);
-		bsfcLabel = new JLabel(bsfcLabelText);
-		torqueLabel = new JLabel(torqueLabelText);
 		massLabel = new JLabel(massLabelText);
 		volumeLabel = new JLabel(volumeLabelText);
 		mpgLabel = new JLabel(mpgLabelText);
@@ -208,9 +201,6 @@ public class BSFCgui implements ActionListener {
 	private void pairLabelsAndFields() {
 		speedLabel.setLabelFor(speedField);
 		distanceLabel.setLabelFor(distanceField);
-		rpmLabel.setLabelFor(rpmField);
-		bsfcLabel.setLabelFor(bsfcField);
-		torqueLabel.setLabelFor(torqueField);
 		massLabel.setLabelFor(massField);
 		volumeLabel.setLabelFor(volumeField);
 		mpgLabel.setLabelFor(mpgField);
@@ -245,12 +235,6 @@ public class BSFCgui implements ActionListener {
 		speedField.setColumns(10);
 		distanceField = new JFormattedTextField(distanceFormat);
 		distanceField.setColumns(10);
-		rpmField = new JFormattedTextField(rpmFormat);
-		rpmField.setColumns(10);
-		torqueField = new JFormattedTextField(torqueFormat);
-		torqueField.setColumns(10);
-		bsfcField = new JFormattedTextField(bsfcFormat);
-		bsfcField.setColumns(10);
 		massField = new JFormattedTextField(massFormat);
 		massField.setColumns(10);
 		massField.setEditable(false);
@@ -280,46 +264,18 @@ public class BSFCgui implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		Object source = event.getSource();
 		if (source.equals(calcButton)) {
-			calcButtonAction();
+			valueGrabber();
 		} else {
-			try {
-				frame.setVisible(false);
-				clearButtonAction();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+			clearButtonAction();
 		}
 	}
 
 	/*
 	 * re-launches the program with blank fields
 	 */
-	private void clearButtonAction() throws FileNotFoundException {
-		@SuppressWarnings("unused")
+	private void clearButtonAction() {
+		frame.setVisible(false);
 		BSFCgui gui = new BSFCgui();
-	}
-
-	/*
-	 * grabs values from text fields and calls the two calculate methods
-	 */
-	private void calcButtonAction() {
-		/*
-		 * make it so the program parses the csv file based on bsfc and rpm
-		 * value
-		 */
-		double speed = (long) speedField.getValue();
-		double distance = (long) distanceField.getValue();
-		double rpm = (long) rpmField.getValue();
-		double bsfc = (long) bsfcField.getValue();
-		double torque = (long) torqueField.getValue();
-		double massConsumed = calculateMass(speed, distance, rpm, bsfc, torque);
-		double volumeConsumed = calculateVolume(massConsumed);
-		double mpg = calculateMPG(massConsumed, distance);
-		massField.setValue(massConsumed);
-		volumeField.setValue(volumeConsumed);
-		mpgField.setValue(mpg);
-		speed = speed * 0.44704; // mph to m/s
-		velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
 	/*
@@ -351,48 +307,49 @@ public class BSFCgui implements ActionListener {
 		double mass = 0;
 		double bsfc1 = bsfc / 3600000; // converts to g/s
 		double rpm1 = rpm * (2 * Math.PI / 60);
-		speed = speed * 0.000277778;
+		speed = speed * 0.000277778; //convert mph to mi/sec
 		mass = (double) (bsfc1 * rpm1 * torque * distance);
 		mass = (double) (mass / speed);
 		mass = mass / 1000;
 		return mass;
 	}
 
-	/*
-	 * loop to calculate mass and velocities
-	 */
-	private void velocityLoop(double distance, double w, double T, double BSFC, double velocityVehicle) {
-		double wcruise = 0; // get these from csv
-		double Tcruise = 0; // get these from csv
-		double massVehicle = 1060.045; // (kg)
-		double velocityOld = 30 * 0.44704; // accelerating from 30mph
-		double Dt = .1;
-		double Dvelocity;
-		double velocityNew;
-		double dist = 0;
+	// /*
+	// * loop to calculate mass and velocities
+	// */
+	// private void velocityLoop(double distance, double w, double T, double
+	// BSFC, double velocityVehicle) {
+	// double wcruise = 0; // get these from csv
+	// double Tcruise = 0; // get these from csv
+	// double massVehicle = 1060.045; // (kg)
+	// double velocityOld = 30 * 0.44704; // accelerating from 30mph
+	// double Dt = .1;
+	// double Dvelocity;
+	// double velocityNew;
+	// double dist = 0;
+	//
+	// System.out.println("Dist: " + dist);
+	// System.out.println("Velocity old: " + velocityOld);
+	// if (velocityVehicle > 20 && velocityVehicle < 125) {
+	// while (dist < distance) {
+	// Dvelocity = (w * T - (wcruise * Tcruise)) / (massVehicle *
+	// velocityVehicle);
+	// System.out.println("Velocity old: " + velocityOld);
+	// velocityNew = velocityOld + Dvelocity;
+	// velocityOld = velocityNew;
+	// System.out.println("D velocity: " + Dvelocity);
+	// System.out.println("Velocity new: " + velocityNew);
+	// dist = dist + velocityVehicle * Dt; // = SUM(velocity*Dt);
+	// System.out.println("dist: " + dist + "\n");
+	// w++;
+	// T++;
+	// }
+	// } else {
+	// System.out.println("Speed too low or too high.");
+	// }
+	// }
 
-		System.out.println("Dist: " + dist);
-		System.out.println("Velocity old: " + velocityOld);
-		if (velocityVehicle > 20 && velocityVehicle < 125) {
-			while (dist < distance) {
-				Dvelocity = (w * T - (wcruise * Tcruise)) / (massVehicle * velocityVehicle);
-				System.out.println("Velocity old: " + velocityOld);
-				velocityNew = velocityOld + Dvelocity;
-				velocityOld = velocityNew;
-				System.out.println("D velocity: " + Dvelocity);
-				System.out.println("Velocity new: " + velocityNew);
-				dist = dist + velocityVehicle * Dt; // = SUM(velocity*Dt);
-				System.out.println("dist: " + dist + "\n");
-				w++;
-				T++;
-			}
-		} else {
-			System.out.println("Speed too low or too high.");
-		}
-	}
-
-	public static void main(String[] args) throws FileNotFoundException {
-		@SuppressWarnings("unused")
+	public static void main(String[] args) {
 		BSFCgui gui = new BSFCgui();
 	}
 }
