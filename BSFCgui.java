@@ -57,21 +57,26 @@ public class BSFCgui implements ActionListener {
 				13, 32, 51, 11, 32, 18, 10, 34, 33, 30, 39, 35, 11, 35, 35, 34 };
 		double speed = (long) speedField.getValue();
 		int index = 0;
-		double upper = speed + (speed * .05);
-		double lower = speed - (speed * .05);
-		while(index < 145) {
+		int sentinel = 0;
+		while (sentinel != -1) {
 			if (speedArray[index] == speed) {
-				index = 146;
-			} else if (speedArray[index] < upper && speedArray[index] > lower) {
-				speed = (speed + ((upper + lower) / 2));
-			} else if (speedArray[index] < upper) {
-				speed = (speed + ((upper + speed) / 2));
-			} else if (speedArray[index] > lower) {
-				speed = (speed + ((lower + speed) / 2));
+				sentinel = -1;
 			}
-			index++;
+			if (sentinel != -1) {
+				index++;
+			}
+			if (speedArray[index] != speed) {
+				sentinel = -1;
+				JOptionPane.showMessageDialog(null, "Speed not found in data. Program will re-launch.", "ERROR",
+						JOptionPane.WARNING_MESSAGE);
+				clearButtonAction();
+			}
 		}
-		
+		System.out.println("Index: " + index);
+		System.out.println("Speed: " + speed);
+		// double upper = speed + (speed * .05);
+		// double lower = speed - (speed * .05);
+
 		int[] rpmArray = { 1703, 2059, 1668, 2079, 1970, 1674, 2783, 1761, 2762, 2270, 1527, 1193, 2449, 1658, 2433,
 				1600, 1812, 1455, 1933, 1961, 1386, 1610, 1312, 2106, 1608, 1372, 1143, 2033, 1109, 1121, 1512, 1130,
 				1487, 1836, 1229, 1512, 1639, 819, 1639, 1184, 1701, 1635, 1008, 1936, 1576, 2197, 1669, 673, 995, 965,
@@ -103,6 +108,7 @@ public class BSFCgui implements ActionListener {
 				104.5064476, 104.5064476, 104.5064476, 105.6182183, 106.729989, 106.729989, 106.729989, 106.729989,
 				108.9535305, 108.9535305, 110.0653012, 110.0653012 };
 		double torque = torqueArray[index];
+		System.out.println("Torque: " + torque);
 
 		double[] bsfcArray = { 981.1239144, 2558.746305, 418.0431635, 343.806749, 489.1955478, 287.940403, 510.6226268,
 				1972.57751, 744.5678257, 278.7559509, 310.8419848, 309.7035376, 4.232277366, 402.263044, 3.380571601,
@@ -123,21 +129,22 @@ public class BSFCgui implements ActionListener {
 				322.5586923, 516.0939077, 79.29803116, 314.7035908, 383.0558685, 329.205822, 291.1977361, 284.5858242,
 				72.78887319, 261.4457486, 315.751814, 278.2402068, 316.6775381, 305.4363554, 0.6969557593, 208.505942,
 				288.1417599, 360.0490781, 234.9573586 };
-
 		double bsfc = bsfcArray[index];
+		System.out.println("BSFC: " + bsfc);
 		double distance = (long) distanceField.getValue();
 		double massConsumed = calculateMass(speed, distance, rpm, bsfc, torque);
 		double volumeConsumed = calculateVolume(massConsumed);
 		double mpg = calculateMPG(massConsumed, distance);
-		System.out.println("Mass consumed: " +  massConsumed);
+		System.out.println("RPM: " + rpm);
+		System.out.println("Mass consumed: " + massConsumed);
 		System.out.println("Volume consumed: " + volumeConsumed);
 		System.out.println("MPG: " + mpg);
 		massField.setValue(massConsumed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
-		
-		//speed = speed * 0.44704; // mph to m/s
-		// velocityLoop(distance, rpm, torque, bsfc, speed);	
+
+		// speed = speed * 0.44704; // mph to m/s
+		// velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
 	/*
@@ -307,7 +314,7 @@ public class BSFCgui implements ActionListener {
 		double mass = 0;
 		double bsfc1 = bsfc / 3600000; // converts to g/s
 		double rpm1 = rpm * (2 * Math.PI / 60);
-		speed = speed * 0.000277778; //convert mph to mi/sec
+		speed = speed * 0.000277778; // convert mph to mi/sec
 		mass = (double) (bsfc1 * rpm1 * torque * distance);
 		mass = (double) (mass / speed);
 		mass = mass / 1000;
