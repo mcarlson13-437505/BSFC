@@ -59,23 +59,24 @@ public class BSFCgui implements ActionListener {
 		int index = 0;
 		int sentinel = 0;
 		while (sentinel != -1) {
-			if (speedArray[index] == speed) {
-				sentinel = -1;
-			}
-			if (sentinel != -1) {
-				index++;
-			}
-			if (speedArray[index] != speed) {
+			if (index == speedArray.length) {
 				sentinel = -1;
 				JOptionPane.showMessageDialog(null, "Speed not found in data. Program will re-launch.", "ERROR",
 						JOptionPane.WARNING_MESSAGE);
 				clearButtonAction();
+			} else if (speedArray[index] == speed) {
+				sentinel = -1;
+			} else {
+				index++;
 			}
 		}
+
 		System.out.println("Index: " + index);
 		System.out.println("Speed: " + speed);
-		// double upper = speed + (speed * .05);
-		// double lower = speed - (speed * .05);
+		double upper = speed + (speed * .05);
+		double lower = speed - (speed * .05);
+		System.out.println("Upper: " + upper);
+		System.out.println("Lower: " + lower);
 
 		int[] rpmArray = { 1703, 2059, 1668, 2079, 1970, 1674, 2783, 1761, 2762, 2270, 1527, 1193, 2449, 1658, 2433,
 				1600, 1812, 1455, 1933, 1961, 1386, 1610, 1312, 2106, 1608, 1372, 1143, 2033, 1109, 1121, 1512, 1130,
