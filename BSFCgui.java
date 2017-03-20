@@ -4,37 +4,45 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-
 import javax.swing.*;
 
 public class BSFCgui implements ActionListener {
 	// data fields
 	private JFrame frame;
-	private JLabel speedLabel;
+	private JLabel speedLabel, distanceLabel, massLabel, mpgLabel, volumeLabel;
 	private static String speedLabelText = "Enter Average Speed: ";
 	private JLabel speedRangeLabel;
 	private static String speedRangeLabelText = "    (Between 30 and 60 MPH)";
 	private JLabel spacing;
-	private JLabel distanceLabel;
 	private static String distanceLabelText = "Enter Distance travelled (mi): ";
-	private JLabel massLabel;
 	private static String massLabelText = "Mass of fuel consumed (kg): ";
-	private JLabel mpgLabel;
 	private static String mpgLabelText = "MPG for this trip: ";
-	private JLabel volumeLabel;
 	private static String volumeLabelText = "Volume of fuel consumed (gallons): ";
-	public JFormattedTextField speedField;
-	public JFormattedTextField distanceField;
-	public JFormattedTextField massField;
-	public JFormattedTextField mpgField;
-	public JFormattedTextField volumeField;
-	private NumberFormat speedFormat;
-	private NumberFormat massFormat;
-	private NumberFormat distanceFormat;
-	private NumberFormat mpgFormat;
-	private NumberFormat volumeFormat;
+	public JFormattedTextField speedField, distanceField, massField, mpgField, volumeField;
+	private NumberFormat speedFormat, massFormat, distanceFormat, mpgFormat, volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
+	private double[] torque30;
+	private double[] torque31;
+	private double[] torque32;
+	private double[] torque33;
+	private double[] torque34;
+	private double[] torque35;
+	private double[] torque36;
+	private double[] torque37;
+	private double[] torque39;
+	private double[] torque40;
+	private double[] torque41;
+	private double[] torque42;
+	private double[] torque43;
+	private double[] torque44;
+	private double[] torque45;
+	private double[] torque47;
+	private double[] torque48;
+	private double[] torque50;
+	private double[] torque51;
+	private double[] torque53;
+	private double[] torque58;
 	
 	private double[] bsfcArray = { 1932.476445, 1594.992209, 660.9056872, 1521.261226, 1482.622717, 1543.870664,
 			538.5060152, 516.0939077, 1173.874463, 188.0786942, 154.7998661, 138.4100983, 261.4457486, 291.1977361,
@@ -55,14 +63,14 @@ public class BSFCgui implements ActionListener {
 			357.2653112, 480.2915996, 419.5984822, 241.9421334, 422.3337333, 278.7559509, 412.1860613, 348.7808646,
 			84.49258751, 266.2313493, 329.6000079, 329.4281517, 4.232277366, 329.205822, 478.6854764, 463.7623852,
 			316.2166033, 307.7263777, 179.5948322, 744.5678257 }; // g/kwHr
-	
-	private double[] speedArray = { 1, 1, 1, 1, 1, 1, 1, 1, 2, 6, 7, 8, 10, 11, 11, 13, 17, 17, 18, 18, 19, 19, 20, 20, 20,
-			20, 23, 25, 25, 27, 27, 27, 27, 27, 29, 29, 29, 29, 30, 30, 30, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 33,
-			33, 33, 33, 33, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 35, 35, 35, 35,
-			35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 36,
-			36, 36, 37, 37, 37, 37, 37, 39, 39, 39, 40, 40, 41, 42, 42, 42, 43, 43, 43, 43, 44, 45, 45, 45, 45, 47, 47,
-			47, 47, 48, 50, 50, 51, 51, 53, 53, 53, 53, 53, 58 }; // MPH
-	
+
+	private double[] speedArray = { 1, 1, 1, 1, 1, 1, 1, 1, 2, 6, 7, 8, 10, 11, 11, 13, 17, 17, 18, 18, 19, 19, 20, 20,
+			20, 20, 23, 25, 25, 27, 27, 27, 27, 27, 29, 29, 29, 29, 30, 30, 30, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32,
+			33, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 35, 35, 35,
+			35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
+			36, 36, 36, 37, 37, 37, 37, 37, 39, 39, 39, 40, 40, 41, 42, 42, 42, 43, 43, 43, 43, 44, 45, 45, 45, 45, 47,
+			47, 47, 47, 48, 50, 50, 51, 51, 53, 53, 53, 53, 53, 58 }; // MPH
+
 	private int[] rpmArray = { 673, 755, 1757, 737, 731, 702, 694, 700, 977, 1830, 1496, 1300, 1890, 2001, 2431, 2246,
 			995, 2061, 965, 1760, 1008, 1752, 1184, 2061, 2076, 2507, 1512, 1143, 1487, 1669, 1639, 1886, 1724, 1692,
 			1372, 1121, 819, 1737, 1193, 1465, 1725, 1312, 1512, 1478, 1527, 1500, 1439, 1545, 1500, 2502, 1594, 1674,
@@ -72,7 +80,7 @@ public class BSFCgui implements ActionListener {
 			2101, 1700, 1703, 1812, 1838, 2176, 2134, 1836, 1438, 1948, 1936, 1902, 1933, 1970, 1961, 2076, 2079, 2433,
 			2106, 2031, 2105, 2145, 2149, 2117, 2090, 2270, 2197, 2265, 2275, 2334, 2389, 2355, 2449, 2500, 2530, 2519,
 			2509, 2530, 2550, 2762 }; // RPM
-	
+
 	private double[] torqueArray = { 27.79426798, 30.01780941, 31.12958013, 32.24135085, 33.35312157, 33.35312157,
 			96.72405255, 100.0593647, 30.01780941, 57.81207739, 57.81207739, 57.81207739, 104.5064476, 103.3946769,
 			108.9535305, 102.2829061, 28.90603869, 97.83582327, 28.90603869, 104.5064476, 26.68249726, 32.24135085,
@@ -134,7 +142,7 @@ public class BSFCgui implements ActionListener {
 				valueGrabber();
 			} else if (speedArray[index] == speed || (speedArray[index] < upper && speedArray[index] > lower)) {
 				sentinel = -1;
-				torqueGrabber(speed, speedArray, torqueArray, index);
+				//
 			} else {
 				index++;
 			}
@@ -161,21 +169,27 @@ public class BSFCgui implements ActionListener {
 		// velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
-	private void torqueGrabber(double speed, double[] speedArray, double[] torqueArray, int index) {
-		System.out.println("**");
-		boolean condition = true;
-		ArrayList<Double> torqueDropDown = new ArrayList<Double>();
-		while (condition) {
-			double nextSpeed = speedArray[index];
-			if (speed == nextSpeed) {
-				torqueDropDown.add(torqueArray[index]);
-				index++;
-			} else {
-				condition = false;
-			}
-		}
-		System.out.println("Torque Drop Down list: " + torqueDropDown.toString());
-	}
+	// private void torqueGrabber(double speed, double[] speedArray, double[]
+	// torqueArray, int index) {
+	// System.out.println("**");
+	// boolean condition = true;
+	// int torqueIndex = 0;
+	// double nextSpeed = speedArray[index];
+	// torqueDropDown = new double[30];
+	// while (condition) {
+	// if (speed == nextSpeed) {
+	// torqueDropDown[torqueIndex] = torqueArray[index];
+	// torqueIndex++;
+	// index++;
+	// nextSpeed = speedArray[index];
+	// } else {
+	// condition = false;
+	// }
+	// }
+	// for(int i = 0; i < torqueDropDown.length; i++) {
+	// System.out.print(torqueDropDown[i]);
+	// }
+	// }
 
 	/*
 	 * sets up the number formats for each entry/display field
@@ -324,8 +338,9 @@ public class BSFCgui implements ActionListener {
 	 */
 	private double calculateVolume(double massConsumed) {
 		double poundMass = massConsumed * 2.20462; // kg to lb
-		double volume = poundMass / 6.002257; // in gallons, 6.002257 = density regular
-											// fuel (lb/gal)
+		double volume = poundMass / 6.002257; // in gallons, 6.002257 = density
+												// regular
+												// fuel (lb/gal)
 		return volume;
 	}
 
