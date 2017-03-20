@@ -1,9 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import javax.swing.*;
 
 public class BSFCgui implements ActionListener {
@@ -22,28 +20,36 @@ public class BSFCgui implements ActionListener {
 	private NumberFormat speedFormat, massFormat, distanceFormat, mpgFormat, volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
-	private double[] torque30;
-	private double[] torque31;
-	private double[] torque32;
-	private double[] torque33;
-	private double[] torque34;
-	private double[] torque35;
-	private double[] torque36;
-	private double[] torque37;
-	private double[] torque39;
-	private double[] torque40;
-	private double[] torque41;
-	private double[] torque42;
-	private double[] torque43;
-	private double[] torque44;
-	private double[] torque45;
-	private double[] torque47;
-	private double[] torque48;
-	private double[] torque50;
-	private double[] torque51;
-	private double[] torque53;
-	private double[] torque58;
+	private double[] torque30 = { 17.7883315, 40.02374588, 106.729989 };
+	private double[] torque31 = { 22.23541438, 23.3471851, 41.1355166 };
+	private double[] torque32 = { 17.7883315, 28.90603869, 36.68843373, 38.91197517, 38.91197517, 102.2829061,
+			104.5064476 };
+	private double[] torque33 = { 15.56479007, 21.12364366, 27.79426798, 28.90603869, 106.729989 };
+	private double[] torque34 = { 18.90010222, 18.90010222, 18.90010222, 22.23541438, 25.57072654, 28.90603869,
+			30.01780941, 30.01780941, 32.24135085, 33.35312157, 35.57666301, 36.68843373, 36.68843373, 37.80020445,
+			37.80020445, 44.47082876, 100.0593647, 105.6182183, 110.0653012 };
+	private double[] torque35 = { 13.34124863, 13.34124863, 15.56479007, 15.56479007, 20.01187294, 23.3471851,
+			23.3471851, 24.45895582, 25.57072654, 26.68249726, 26.68249726, 28.90603869, 31.12958013, 31.12958013,
+			31.12958013, 31.12958013, 34.46489229, 34.46489229, 34.46489229, 35.57666301, 37.80020445, 40.02374588,
+			40.02374588, 43.35905804, 55.58853595, 55.58853595, 58.92384811, 106.729989, 108.9535305, 110.0653012 };
+	private double[] torque36 = { 23.3471851, 45.58259948, 55.58853595 };
+	private double[] torque37 = { 13.34124863, 18.90010222, 45.58259948, 60.03561883, 62.25916026 };
+	private double[] torque39 = { 24.45895582, 36.68843373, 106.729989 };
+	private double[] torque40 = { 26.68249726, 36.68843373 };
+	private double[] torque41 = { 20.01187294 };
+	private double[] torque42 = { 14.45301935, 20.01187294, 94.50051112 };
+	private double[] torque43 = { 13.34124863, 18.90010222, 22.23541438, 40.02374588 };
+	private double[] torque44 = { 56.70030667 };
+	private double[] torque45 = { 30.01780941, 42.24728732, 51.14145307, 71.15332602 };
+	private double[] torque47 = { 16.67656079, 27.79426798, 43.35905804, 55.58853595 };
+	private double[] torque48 = { 31.12958013 };
+	private double[] torque50 = { 41.1355166, 61.14738955 };
+	private double[] torque51 = { 17.7883315, 102.2829061 };
+	private double[] torque53 = { 30.01780941, 36.68843373, 44.47082876, 46.6943702, 51.14145307 };
+	private double[] torque58 = { 15.56479007 };
 	
+	private JComboBox torqueDropDown;
+
 	private double[] bsfcArray = { 1932.476445, 1594.992209, 660.9056872, 1521.261226, 1482.622717, 1543.870664,
 			538.5060152, 516.0939077, 1173.874463, 188.0786942, 154.7998661, 138.4100983, 261.4457486, 291.1977361,
 			208.505942, 314.7035908, 293.0854415, 70.22112935, 285.1594852, 72.78887319, 255.3589648, 921.121357,
@@ -142,7 +148,6 @@ public class BSFCgui implements ActionListener {
 				valueGrabber();
 			} else if (speedArray[index] == speed || (speedArray[index] < upper && speedArray[index] > lower)) {
 				sentinel = -1;
-				//
 			} else {
 				index++;
 			}
@@ -151,6 +156,7 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Speed: " + speed);
 		int rpm = rpmArray[index];
 		double torque = torqueArray[index];
+		torqueGrabber(torque);
 		System.out.println("Torque: " + torque);
 		double bsfc = bsfcArray[index];
 		System.out.println("BSFC: " + bsfc);
@@ -169,27 +175,69 @@ public class BSFCgui implements ActionListener {
 		// velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
-	// private void torqueGrabber(double speed, double[] speedArray, double[]
-	// torqueArray, int index) {
-	// System.out.println("**");
-	// boolean condition = true;
-	// int torqueIndex = 0;
-	// double nextSpeed = speedArray[index];
-	// torqueDropDown = new double[30];
-	// while (condition) {
-	// if (speed == nextSpeed) {
-	// torqueDropDown[torqueIndex] = torqueArray[index];
-	// torqueIndex++;
-	// index++;
-	// nextSpeed = speedArray[index];
-	// } else {
-	// condition = false;
-	// }
-	// }
-	// for(int i = 0; i < torqueDropDown.length; i++) {
-	// System.out.print(torqueDropDown[i]);
-	// }
-	// }
+	private void torqueGrabber(double torque) {
+		if (torqueContains(torque30, torque)) {
+			fillDropDown(torque30);
+		} else if (torqueContains(torque31, torque)) {
+			fillDropDown(torque31);
+		} else if (torqueContains(torque32, torque)) {
+			fillDropDown(torque32);
+		} else if (torqueContains(torque33, torque)) {
+			fillDropDown(torque33);
+		} else if (torqueContains(torque34, torque)) {
+			fillDropDown(torque34);
+		} else if (torqueContains(torque35, torque)) {
+			fillDropDown(torque35);
+		} else if (torqueContains(torque36, torque)) {
+			fillDropDown(torque36);
+		} else if (torqueContains(torque37, torque)) {
+			fillDropDown(torque37);
+		} else if (torqueContains(torque39, torque)) {
+			fillDropDown(torque39);
+		} else if (torqueContains(torque40, torque)) {
+			fillDropDown(torque40);
+		} else if (torqueContains(torque41, torque)) {
+			fillDropDown(torque41);
+		} else if (torqueContains(torque42, torque)) {
+			fillDropDown(torque42);
+		} else if (torqueContains(torque43, torque)) {
+			fillDropDown(torque43);
+		} else if (torqueContains(torque44, torque)) {
+			fillDropDown(torque44);
+		} else if (torqueContains(torque45, torque)) {
+			fillDropDown(torque45);
+		} else if (torqueContains(torque47, torque)) {
+			fillDropDown(torque47);
+		} else if (torqueContains(torque48, torque)) {
+			fillDropDown(torque48);
+		} else if (torqueContains(torque50, torque)) {
+			fillDropDown(torque50);
+		} else if (torqueContains(torque51, torque)) {
+			fillDropDown(torque51);
+		} else if (torqueContains(torque53, torque)) {
+			fillDropDown(torque53);
+		} else if (torqueContains(torque58, torque)) {
+			fillDropDown(torque58);
+		}
+	}
+
+	private void fillDropDown(double[] torque) {
+		torqueDropDown = new JComboBox();
+		//torqueDropDown = torque;
+	}
+
+	private boolean torqueContains(double[] array, double torque) {
+		boolean condition = true;
+		int index = 0;
+		while (condition) {
+			if (array[index] == torque) {
+				condition = true;
+			} else {
+				condition = false;
+			}
+		}
+		return condition;
+	}
 
 	/*
 	 * sets up the number formats for each entry/display field
@@ -220,8 +268,11 @@ public class BSFCgui implements ActionListener {
 		fieldPane.add(massField);
 		fieldPane.add(volumeField);
 		fieldPane.add(mpgField);
+		JPanel bottomPane = new JPanel();
+		//bottomPane.add(torqueDropDown);
 		frame.add(labelPane, BorderLayout.CENTER);
 		frame.add(fieldPane, BorderLayout.LINE_END);
+		//frame.add(bottomPane, BorderLayout.SOUTH);
 	}
 
 	/*
