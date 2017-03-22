@@ -20,32 +20,6 @@ public class BSFCgui implements ActionListener {
 	private NumberFormat speedFormat, massFormat, distanceFormat, mpgFormat, volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
-	private double avg30 = 54.847;
-	private double avg31 = 28.906;
-	private double avg32 = 52.571;
-	private double avg33 = 40.024;
-	private double avg34 = 42.306;
-	private double avg35 = 39.246;
-	private double avg36 = 41.506;
-	private double avg37 = 40.024;
-	private double avg39 = 55.959;
-	private double avg40 = 31.685;
-	private double avg41 = 20.012;
-	private double avg42 = 42.988;
-	private double avg43 = 23.625;
-	private double avg44 = 56.700;
-	private double avg45 = 48.640;
-	private double avg47 = 35.855;
-	private double avg48 = 31.130;
-	private double avg50 = 51.141;
-	private double avg51 = 60.036;
-	private double avg53 = 41.803;
-	private double avg58 = 15.565;
-	private double otherAvg = 60.345; /*
-										 * avg of data points 1mph - 29mph for
-										 * data not within +/- 1mph of previous
-										 * or next speed avg
-										 */
 
 	private double[] bsfcArray = { 1932.476445, 1594.992209, 660.9056872, 1521.261226, 1482.622717, 1543.870664,
 			538.5060152, 516.0939077, 1173.874463, 188.0786942, 154.7998661, 138.4100983, 261.4457486, 291.1977361,
@@ -114,7 +88,6 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Upper five %: " + upper);
 		System.out.println("Lower five %: " + lower);
 		int index = 0;
-
 		int sentinel = 0;
 		while (sentinel != -1) {
 			if (index == speedArray.length) {
@@ -132,10 +105,8 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Index: " + index);
 		System.out.println("Speed: " + speed);
 		int rpm = rpmArray[index];
-
 		// finds the average of torques within that array for calculations
 		double torqueToUse = torqueGrabber(speed);
-
 		System.out.println("Torque: " + torqueToUse);
 		double bsfc = bsfcArray[index];
 		System.out.println("BSFC: " + bsfc);
@@ -160,67 +131,67 @@ public class BSFCgui implements ActionListener {
 	private double torqueGrabber(double speed) {
 		double torqueToUse = 0;
 		if (speed == 30.0) {
-			torqueToUse = avg30;
+			torqueToUse = 54.847;
 		} else if (speed == 31.0) {
-			torqueToUse = avg31;
+			torqueToUse = 28.906;
 		} else if (speed == 32.0) {
-			torqueToUse = avg32;
+			torqueToUse = 52.571;
 		} else if (speed == 33.0) {
-			torqueToUse = avg33;
+			torqueToUse = 40.024;
 		} else if (speed == 34.0) {
-			torqueToUse = avg34;
+			torqueToUse = 42.306;
 		} else if (speed == 35.0) {
-			torqueToUse = avg35;
+			torqueToUse = 39.246;
 		} else if (speed == 36.0) {
-			torqueToUse = avg36;
+			torqueToUse = 41.506;
 		} else if (speed == 37.0) {
-			torqueToUse = avg37;
+			torqueToUse = 40.024;
 		} else if (speed == 38.0) {
-			torqueToUse = (avg37 + avg39) / 2;
+			torqueToUse = (40.024 + 55.959) / 2;
 		} else if (speed == 39.0) {
-			torqueToUse = avg39;
+			torqueToUse = 55.959;
 		} else if (speed == 40.0) {
-			torqueToUse = avg40;
+			torqueToUse = 31.685;
 		} else if (speed == 41.0) {
-			torqueToUse = avg41;
+			torqueToUse = 20.012;
 		} else if (speed == 42.0) {
-			torqueToUse = avg42;
+			torqueToUse = 42.988;
 		} else if (speed == 43.0) {
-			torqueToUse = avg43;
+			torqueToUse = 23.625;
 		} else if (speed == 44.0) {
-			torqueToUse = avg44;
+			torqueToUse = 56.700;
 		} else if (speed == 45.0) {
-			torqueToUse = avg45;
+			torqueToUse = 48.640;
 		} else if (speed == 46.0) {
-			torqueToUse = (avg45 + avg47) / 2;
+			torqueToUse = (48.640 + 35.855) / 2;
 		} else if (speed == 47.0) {
-			torqueToUse = avg47;
+			torqueToUse = 35.855;
 		} else if (speed == 48.0) {
-			torqueToUse = avg48;
+			torqueToUse = 31.130;
 		} else if (speed == 49.0) {
-			torqueToUse = (avg48 + avg50) / 2;
+			torqueToUse = (31.130 + 51.141) / 2;
 		} else if (speed == 50.0) {
-			torqueToUse = avg50;
+			torqueToUse = 51.141;
 		} else if (speed == 51.0) {
-			torqueToUse = avg51;
+			torqueToUse = 60.036;
 		} else if (speed == 52.0) {
-			torqueToUse = (avg51 + avg53) / 2;
+			torqueToUse = (60.036 + 41.803) / 2;
 		} else if (speed == 53.0) {
-			torqueToUse = avg53;
+			torqueToUse = 41.803;
 		} else if (speed == 54.0) {
-			torqueToUse = otherAvg;
+			torqueToUse = 60.345;
 		} else if (speed == 55.0) {
-			torqueToUse = otherAvg;
+			torqueToUse = 60.345;
 		} else if (speed == 56.0) {
-			torqueToUse = otherAvg;
+			torqueToUse = 60.345;
 		} else if (speed == 57.0) {
-			torqueToUse = otherAvg;
+			torqueToUse = 60.345;
 		} else if (speed == 58.0) {
-			torqueToUse = avg58;
+			torqueToUse = 15.565;
 		} else if (speed == 59.0) {
-			torqueToUse = otherAvg;
+			torqueToUse = 60.345;
 		} else if (speed == 60.0) {
-			torqueToUse = otherAvg;
+			torqueToUse = 60.345;
 		}
 		return torqueToUse;
 	}
@@ -365,6 +336,7 @@ public class BSFCgui implements ActionListener {
 	 */
 	private void clearButtonAction() {
 		frame.setVisible(false);
+		@SuppressWarnings("unused")
 		BSFCgui gui = new BSFCgui();
 	}
 
@@ -441,6 +413,7 @@ public class BSFCgui implements ActionListener {
 	// }
 
 	public static void main(String[] args) {
+		@SuppressWarnings("unused")
 		BSFCgui gui = new BSFCgui();
 	}
 }
