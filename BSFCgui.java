@@ -268,7 +268,7 @@ public class BSFCgui implements ActionListener {
 		speedRangeLabel.setForeground(Color.RED);
 		spacing = new JLabel("           ");
 		distanceLabel = new JLabel(distanceLabelText);
-		torqueLabel = new JLabel("Select acceleration type: ");
+		torqueLabel = new JLabel("Select acceleration style: ");
 		massLabel = new JLabel(massLabelText);
 		volumeLabel = new JLabel(volumeLabelText);
 		mpgLabel = new JLabel(mpgLabelText);
