@@ -7,17 +7,19 @@ import javax.swing.*;
 public class BSFCgui implements ActionListener {
 	// data fields
 	private JFrame frame;
-	private JLabel speedLabel, distanceLabel, massLabel, mpgLabel, volumeLabel;
+	private JLabel initialSpeedLabel, finalSpeedLabel, distanceLabel, massLabel, mpgLabel, volumeLabel;
 	private JLabel speedRangeLabel;
 	private JLabel spacing;
-	private static String speedRangeLabelText = "    (Whole # between 30 and 60 MPH)";
-	private static String speedLabelText = "Enter Average Speed: ";
+	private static String speedRangeLabelText = "    (Whole #'s between 30 and 60 MPH)";
+	private static String initialSpeedLabelText = "Enter Initial Speed (MPH): ";
+	private static String finalSpeedLabelText = "Enter Final Speed (MPH): ";
 	private static String distanceLabelText = "Enter Distance travelled (mi): ";
 	private static String massLabelText = "Mass of fuel consumed (kg): ";
 	private static String mpgLabelText = "MPG for this trip: ";
 	private static String volumeLabelText = "Volume of fuel consumed (gallons): ";
-	public JFormattedTextField speedField, distanceField, massField, mpgField, volumeField;
-	private NumberFormat speedFormat, massFormat, distanceFormat, mpgFormat, volumeFormat;
+	public JFormattedTextField initialSpeedField, finalSpeedField, distanceField, massField, mpgField,
+			volumeField;
+	private NumberFormat initialSpeedFormat, finalSpeedFormat, massFormat, distanceFormat, mpgFormat, volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
 
@@ -57,6 +59,9 @@ public class BSFCgui implements ActionListener {
 			2101, 1700, 1703, 1812, 1838, 2176, 2134, 1836, 1438, 1948, 1936, 1902, 1933, 1970, 1961, 2076, 2079, 2433,
 			2106, 2031, 2105, 2145, 2149, 2117, 2090, 2270, 2197, 2265, 2275, 2334, 2389, 2355, 2449, 2500, 2530, 2519,
 			2509, 2530, 2550, 2762 }; // RPM
+	private JComboBox torqueDropDown;
+	private String accelType;
+	private JLabel torqueLabel;
 
 	/*
 	 * constructor
@@ -67,6 +72,7 @@ public class BSFCgui implements ActionListener {
 		pairLabelsAndFields();
 		setUpFormats();
 		setUpFields();
+		createTorqueDropDown();
 		addPanelToFrame();
 		addButtonsToFrame();
 		displayFrame();
@@ -77,41 +83,42 @@ public class BSFCgui implements ActionListener {
 	 * grab values in order to calculate
 	 */
 	private void valueGrabber() {
-		double speed = (long) speedField.getValue();
-		if (speed < 30 || speed > 60) {
+		double initialSpeed = (long) initialSpeedField.getValue();
+		double finalSpeed = (long) finalSpeedField.getValue();
+		if (initialSpeed < 30 || finalSpeed > 60) {
 			JOptionPane.showMessageDialog(null, "Invalid speed input. Program will re-launch.", "ERROR",
 					JOptionPane.WARNING_MESSAGE);
 			clearButtonAction();
 		}
-		double upper = speed + (speed * .05);
-		double lower = speed - (speed * .05);
+		double upper = initialSpeed + (initialSpeed * .05);
+		double lower = initialSpeed - (initialSpeed * .05);
 		System.out.println("Upper five %: " + upper);
 		System.out.println("Lower five %: " + lower);
 		int index = 0;
 		int sentinel = 0;
 		while (sentinel != -1) {
 			if (index == speedArray.length) {
-				upper = speed + (speed * .1);
-				lower = speed - (speed * .1);
+				upper = initialSpeed + (initialSpeed * .1);
+				lower = initialSpeed - (initialSpeed * .1);
 				System.out.println("Upper Ten %: " + upper);
 				System.out.println("Lower Ten %: " + lower);
 				valueGrabber();
-			} else if (speedArray[index] == speed || (speedArray[index] < upper && speedArray[index] > lower)) {
+			} else if (speedArray[index] == initialSpeed || (speedArray[index] < upper && speedArray[index] > lower)) {
 				sentinel = -1;
 			} else {
 				index++;
 			}
 		}
 		System.out.println("Index: " + index);
-		System.out.println("Speed: " + speed);
+		System.out.println("Speed: " + initialSpeed);
 		int rpm = rpmArray[index];
 		// finds the average of torques within that array for calculations
-		double torqueToUse = torqueGrabber(speed);
+		double torqueToUse = torqueGrabber(initialSpeed);
 		System.out.println("Torque: " + torqueToUse);
 		double bsfc = bsfcArray[index];
 		System.out.println("BSFC: " + bsfc);
 		double distance = (long) distanceField.getValue();
-		double massConsumed = calculateMass(speed, distance, rpm, bsfc, torqueToUse);
+		double massConsumed = calculateMass(initialSpeed, distance, rpm, bsfc, torqueToUse);
 		double volumeConsumed = calculateVolume(massConsumed);
 		double mpg = calculateMPG(massConsumed, distance);
 		System.out.println("RPM: " + rpm);
@@ -123,6 +130,11 @@ public class BSFCgui implements ActionListener {
 		mpgField.setValue(mpg);
 		// speed = speed * 0.44704; // mph to meter/s
 		// velocityLoop(distance, rpm, torque, bsfc, speed);
+	}
+
+	private void createTorqueDropDown() {
+		String[] torqueDropStrings = { "          Slow", "          Moderate", "          Quick" };
+		torqueDropDown = new JComboBox(torqueDropStrings);
 	}
 
 	/*
@@ -200,7 +212,8 @@ public class BSFCgui implements ActionListener {
 	 * sets up the number formats for each entry/display field
 	 */
 	private void setUpFormats() {
-		speedFormat = NumberFormat.getNumberInstance();
+		initialSpeedFormat = NumberFormat.getNumberInstance();
+		finalSpeedFormat = NumberFormat.getNumberInstance();
 		massFormat = NumberFormat.getNumberInstance();
 		distanceFormat = NumberFormat.getNumberInstance();
 		mpgFormat = NumberFormat.getNumberInstance();
@@ -212,16 +225,20 @@ public class BSFCgui implements ActionListener {
 	 */
 	private void addPanelToFrame() {
 		JPanel labelPane = new JPanel(new GridLayout(0, 1));
-		labelPane.add(speedLabel);
+		labelPane.add(initialSpeedLabel);
+		labelPane.add(finalSpeedLabel);
 		labelPane.add(speedRangeLabel);
 		labelPane.add(distanceLabel);
+		labelPane.add(torqueLabel);
 		labelPane.add(massLabel);
 		labelPane.add(volumeLabel);
 		labelPane.add(mpgLabel);
 		JPanel fieldPane = new JPanel(new GridLayout(0, 1));
-		fieldPane.add(speedField);
+		fieldPane.add(initialSpeedField);
+		fieldPane.add(finalSpeedField);
 		fieldPane.add(spacing);
 		fieldPane.add(distanceField);
+		fieldPane.add(torqueDropDown);
 		fieldPane.add(massField);
 		fieldPane.add(volumeField);
 		fieldPane.add(mpgField);
@@ -236,21 +253,22 @@ public class BSFCgui implements ActionListener {
 		JPanel buttonPanel = new JPanel(new FlowLayout());
 		buttonPanel.add(calcButton);
 		buttonPanel.add(clearButton);
-		frame.add(buttonPanel, BorderLayout.SOUTH);
-		JLabel spacing = new JLabel("     ");
-		frame.add(spacing, BorderLayout.EAST);
+		JLabel spacing = new JLabel("    ");
 		frame.add(spacing, BorderLayout.WEST);
+		frame.add(buttonPanel, BorderLayout.SOUTH);
 	}
 
 	/*
 	 * creates labels
 	 */
 	private void createLabels() {
-		speedLabel = new JLabel(speedLabelText);
+		initialSpeedLabel = new JLabel(initialSpeedLabelText);
+		finalSpeedLabel = new JLabel(finalSpeedLabelText);
 		speedRangeLabel = new JLabel(speedRangeLabelText);
 		speedRangeLabel.setForeground(Color.RED);
 		spacing = new JLabel("           ");
 		distanceLabel = new JLabel(distanceLabelText);
+		torqueLabel = new JLabel("Select acceleration type: ");
 		massLabel = new JLabel(massLabelText);
 		volumeLabel = new JLabel(volumeLabelText);
 		mpgLabel = new JLabel(mpgLabelText);
@@ -260,8 +278,10 @@ public class BSFCgui implements ActionListener {
 	 * initializes labels and sets their text
 	 */
 	private void pairLabelsAndFields() {
-		speedLabel.setLabelFor(speedField);
+		initialSpeedLabel.setLabelFor(initialSpeedField);
+		finalSpeedLabel.setLabelFor(finalSpeedField);
 		distanceLabel.setLabelFor(distanceField);
+		torqueLabel.setLabelFor(torqueDropDown);
 		massLabel.setLabelFor(massField);
 		volumeLabel.setLabelFor(volumeField);
 		mpgLabel.setLabelFor(mpgField);
@@ -272,7 +292,7 @@ public class BSFCgui implements ActionListener {
 	 */
 	@SuppressWarnings("static-access")
 	public void setUpFrame() {
-		frame = new JFrame("BSFC Calculator");
+		frame = new JFrame("Efficiency Calculator");
 		frame.setLayout(new BorderLayout());
 		frame.setResizable(false);
 		frame.getRootPane().setDefaultButton(calcButton);
@@ -292,8 +312,10 @@ public class BSFCgui implements ActionListener {
 	 * sets the formatted text fields
 	 */
 	public void setUpFields() {
-		speedField = new JFormattedTextField(speedFormat);
-		speedField.setColumns(10);
+		initialSpeedField = new JFormattedTextField(initialSpeedFormat);
+		initialSpeedField.setColumns(10);
+		finalSpeedField = new JFormattedTextField(finalSpeedFormat);
+		finalSpeedField.setColumns(10);
 		distanceField = new JFormattedTextField(distanceFormat);
 		distanceField.setColumns(10);
 		massField = new JFormattedTextField(massFormat);
