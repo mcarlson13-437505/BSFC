@@ -308,13 +308,17 @@ public class BSFCgui implements ActionListener {
 	 */
 	private double grabTorque() {
 		double torqueToUse = 0;
+		double[] array = findArray();
+		String choiceSlow = "          Slow";
+		String choiceMod = "          Moderate";
+		String choiceQuick = "          Quick";
 		String choice = (String) torqueDropDown.getSelectedItem();
-		if (choice.equals("          Slow")) {
-			torqueToUse = slowAcceleration();
-		} else if (choice.equals("          Moderate")) {
-			torqueToUse = moderateAcceleration();
-		} else if (choice.equals("          Quick")) {
-			torqueToUse = quickAcceleration();
+		if (choice.equals(choiceSlow)) {
+			torqueToUse = slowAcceleration(array,1);
+		} else if (choice.equals(choiceMod)) {
+			torqueToUse = moderateAcceleration(array,2);
+		} else if (choice.equals(choiceQuick)) {
+			torqueToUse = quickAcceleration(array,3);
 		} else {
 			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
 					JOptionPane.WARNING_MESSAGE);
@@ -322,23 +326,58 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Choice: " + choice);
 		return torqueToUse;
 	}
+	
+	private int grabRpm() {
+		return 0;
+	}
+	
+	private double findBsfc() {
+		return 0;
+	}
 
-	private double quickAcceleration() {
-		double torqueToUse = 0;
-
+	private double quickAcceleration(double[] array, int x) {
+		double torqueToUse = max(array);
 		return torqueToUse;
 	}
 
-	private double moderateAcceleration() {
-		double torqueToUse = 0;
+	private double[] findArray() {
+		double[] arrayToUse;
+		
+		return arrayToUse;
+	}
+	
+	private int[] findRpmArray() {
+		int[] arrayToUse;
+		
+		return arrayToUse;
+	}
 
+	private double moderateAcceleration(double[] array, int x) {
+		double torqueToUse = mid(array); 
 		return torqueToUse;
 	}
 
-	private double slowAcceleration() {
-		double torqueToUse = 0;
-
+	private double slowAcceleration(double[] array, int x) {
+		double torqueToUse = min(array);
 		return torqueToUse;
+	}
+	
+	private double min(double[] array) {
+		
+		double valueToUse = 0;
+		return valueToUse;
+	}
+	
+	private double mid(double[] array) {
+		
+		double valueToUse = 0;
+		return valueToUse;
+	}
+	
+	private double max(double[] array) {
+		
+		double valueToUse = 0;
+		return valueToUse;
 	}
 
 	/*
