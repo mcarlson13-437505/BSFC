@@ -57,6 +57,59 @@ public class BSFCgui implements ActionListener {
 			2101, 1700, 1703, 1812, 1838, 2176, 2134, 1836, 1438, 1948, 1936, 1902, 1933, 1970, 1961, 2076, 2079, 2433,
 			2106, 2031, 2105, 2145, 2149, 2117, 2090, 2270, 2197, 2265, 2275, 2334, 2389, 2355, 2449, 2500, 2530, 2519,
 			2509, 2530, 2550, 2762 }; // RPM
+	private int[] r30 = { 1193, 1465, 1725 }, r31 = { 1312, 1512, 1478 },
+			r32 = { 1527, 1500, 1439, 1545, 1500, 2502, 1594 }, r33 = { 1674, 1610, 1576, 1980, 1563 },
+			r34 = { 1658, 1600, 1455, 1608, 1639, 1584, 1687, 1416, 1597, 1514, 1591, 1591, 1614, 1605, 1665, 1640,
+					2176, 1555, 1972 },
+			r35 = { 2059, 1668, 2783, 1761, 1386, 2033, 1109, 1229, 1639, 1701, 1635, 1607, 1475, 1708, 1475, 1123,
+					1654, 1660, 1654, 1705, 1656, 1714, 1660, 1704, 1984, 1666, 1656, 1701, 1625, 1867 },
+			r36 = { 1130, 2101, 1700 }, r37 = { 1703, 1812, 1838, 2176, 2134 }, r39 = { 1836, 1438, 1948 },
+			r40 = { 1936, 1902 }, r41 = { 1933 }, r42 = { 1970, 1961, 2076 }, r43 = { 2079, 2433, 2106, 2031 },
+			r44 = { 2105 }, r45 = { 2145, 2149, 2117, 2090 }, r47 = { 2270, 2197, 2265, 2275 }, r48 = { 2334 },
+			r50 = { 2389, 2355 }, r51 = { 2449, 2500 }, r53 = { 2530, 2519, 2509, 2530, 2550 }, r58 = { 2762 };
+
+	private double[] t30 = { 17.7883315, 40.02374588, 106.729989 }, t31 = { 22.23541438, 23.3471851, 41.1355166 },
+			t32 = { 17.7883315, 28.90603869, 36.68843373, 38.91197517, 38.91197517, 102.2829061, 104.5064476 },
+			t33 = { 15.56479007, 21.12364366, 27.79426798, 28.90603869, 106.729989 },
+			t34 = { 18.90010222, 18.90010222, 18.90010222, 22.23541438, 25.57072654, 28.90603869, 30.01780941,
+					30.01780941, 32.24135085, 33.35312157, 35.57666301, 36.68843373, 36.68843373, 37.80020445,
+					37.80020445, 44.47082876, 100.0593647, 105.6182183, 110.0653012 },
+			t35 = { 13.34124863, 13.34124863, 15.56479007, 15.56479007, 20.01187294, 23.3471851, 23.3471851,
+					24.45895582, 25.57072654, 26.68249726, 26.68249726, 28.90603869, 31.12958013, 31.12958013,
+					31.12958013, 31.12958013, 34.46489229, 34.46489229, 34.46489229, 35.57666301, 37.80020445,
+					40.02374588, 40.02374588, 43.35905804, 55.58853595, 55.58853595, 58.92384811, 106.729989,
+					108.9535305, 110.0653012 },
+			t36 = { 23.3471851, 45.58259948, 55.58853595 },
+			t37 = { 13.34124863, 18.90010222, 45.58259948, 60.03561883, 62.25916026 },
+			t39 = { 24.45895582, 36.68843373, 106.729989 }, t40 = { 26.68249726, 36.68843373 }, t41 = { 20.01187294 },
+			t42 = { 14.45301935, 20.01187294, 94.50051112 },
+			t43 = { 13.34124863, 18.90010222, 22.23541438, 40.02374588 }, t44 = { 56.70030667 },
+			t45 = { 30.01780941, 42.24728732, 51.14145307, 71.15332602 },
+			t47 = { 16.67656079, 27.79426798, 43.35905804, 55.58853595 }, t48 = { 31.12958013 },
+			t50 = { 41.1355166, 61.14738955 }, t51 = { 17.7883315, 102.2829061 },
+			t53 = { 30.01780941, 36.68843373, 44.47082876, 46.6943702, 51.14145307 }, t58 = { 15.56479007 };
+
+	private double[] b30 = { 309.7035376, 297.8233957, 316.6775381 }, b31 = { 346.0542332, 285.9808226, 291.1730044 },
+			b32 = { 310.8419848, 396.9953136, 144.1454501, 291.9693866, 319.1305323, 383.0558685, 284.5858242 },
+			b33 = { 287.940403, 3.507899774, 314.4626775, 234.4460514, 278.2402068 },
+			b34 = { 402.263044, 298.8411414, 527.0361828, 369.2176705, 305.4711334, 309.9572376, 332.9214856,
+					396.6373913, 341.9714598, 348.6949409, 314.6871073, 314.2601234, 309.7818193, 314.5635358,
+					303.2279129, 291.5523331, 322.5586923, 315.751814, 234.9573586 },
+			b35 = { 2558.746305, 418.0431635, 510.6226268, 1972.57751, 367.8577462, 200.4144411, 361.953447,
+					266.3824909, 311.5349385, 2.787823037, 2.900359013, 2.723902342, 170.087446, 199.9606165,
+					159.2726373, 209.1960286, 313.0357164, 337.1038441, 376.8120932, 127.9603326, 465.7022618,
+					109.1282783, 290.2838658, 261.0353289, 637.3135453, 275.9860469, 298.7523944, 0.6969557593,
+					288.1417599, 360.0490781 },
+			b36 = { 288.4549088, 286.6708485, 312.9681772 },
+			b37 = { 981.1239144, 3.905775914, 133.0333098, 431.9863351, 578.5478921 },
+			b39 = { 282.8235391, 155.3576403, 305.4363554 }, b40 = { 781.8611823, 456.4035018 }, b41 = { 235.0504977 },
+			b42 = { 489.1955478, 445.1933793, 339.4200166 },
+			b43 = { 343.806749, 3.380571601, 3.319653893, 236.6540562 }, b44 = { 357.2653112 },
+			b45 = { 480.2915996, 419.5984822, 241.9421334, 422.3337333 },
+			b47 = { 278.7559509, 412.1860613, 348.7808646, 84.49258751 }, b48 = { 266.2313493 },
+			b50 = { 329.6000079, 329.4281517 }, b51 = { 4.232277366, 329.205822 },
+			b53 = { 478.6854764, 463.7623852, 316.2166033, 307.7263777, 179.5948322 }, b58 = { 744.5678257 };
+
 	private JComboBox torqueDropDown;
 	private String accelType;
 	private JLabel torqueLabel;
@@ -75,6 +128,21 @@ public class BSFCgui implements ActionListener {
 		addButtonsToFrame();
 		displayFrame();
 		addActionListeners();
+	}
+
+	private double findBsfcValues() {
+		return 0;
+
+	}
+
+	private double findTorqueValues() {
+		return 0;
+
+	}
+
+	private int findRpmValues() {
+		return 0;
+
 	}
 
 	/*
@@ -101,7 +169,8 @@ public class BSFCgui implements ActionListener {
 				System.out.println("Upper Ten %: " + upper);
 				System.out.println("Lower Ten %: " + lower);
 				valueGrabber();
-			} else if (speedArray[index] == initialSpeed || (speedArray[index] < upper && speedArray[index] > lower)) {
+			} else if (speedArray[index] == initialSpeed
+					|| (speedArray[index] <= upper && speedArray[index] >= lower)) {
 				sentinel = -1;
 			} else {
 				index++;
@@ -111,16 +180,18 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Initial Speed: " + initialSpeed);
 		System.out.println("Final Speed: " + finalSpeed);
 		int rpm = rpmArray[index];
+		int rpmToUse = findRpmValues();
 		// finds the average of torques within that array for calculations
-		double torqueToUse = grabTorque();
+		double torqueToUse = findTorqueValues();
 		System.out.println("Torque: " + torqueToUse);
 		double bsfc = bsfcArray[index];
-		System.out.println("BSFC: " + bsfc);
+		double bsfcToUse = findBsfcValues();
+		System.out.println("BSFC: " + bsfcToUse);
 		double distance = 0;
 		double massConsumed = calculateMass(initialSpeed, distance, rpm, bsfc, torqueToUse);
 		double volumeConsumed = calculateVolume(massConsumed);
 		double mpg = calculateMPG(massConsumed, distance);
-		System.out.println("RPM: " + rpm);
+		System.out.println("RPM: " + rpmToUse);
 		System.out.println("Mass consumed: " + massConsumed);
 		System.out.println("Volume consumed: " + volumeConsumed);
 		System.out.println("MPG: " + mpg);
@@ -136,77 +207,6 @@ public class BSFCgui implements ActionListener {
 		String[] torqueDropStrings = { "          Slow", "          Moderate", "          Quick" };
 		torqueDropDown = new JComboBox(torqueDropStrings);
 	}
-
-	/*
-	 * grabs the correct average torque from specified array
-	 */
-	// private double torqueGrabber(double speed) {
-	// double torqueToUse = 0;
-	// if (speed == 30.0) {
-	// torqueToUse = 54.847;
-	// } else if (speed == 31.0) {
-	// torqueToUse = 28.906;
-	// } else if (speed == 32.0) {
-	// torqueToUse = 52.571;
-	// } else if (speed == 33.0) {
-	// torqueToUse = 40.024;
-	// } else if (speed == 34.0) {
-	// torqueToUse = 42.306;
-	// } else if (speed == 35.0) {
-	// torqueToUse = 39.246;
-	// } else if (speed == 36.0) {
-	// torqueToUse = 41.506;
-	// } else if (speed == 37.0) {
-	// torqueToUse = 40.024;
-	// } else if (speed == 38.0) {
-	// torqueToUse = (40.024 + 55.959) / 2;
-	// } else if (speed == 39.0) {
-	// torqueToUse = 55.959;
-	// } else if (speed == 40.0) {
-	// torqueToUse = 31.685;
-	// } else if (speed == 41.0) {
-	// torqueToUse = 20.012;
-	// } else if (speed == 42.0) {
-	// torqueToUse = 42.988;
-	// } else if (speed == 43.0) {
-	// torqueToUse = 23.625;
-	// } else if (speed == 44.0) {
-	// torqueToUse = 56.700;
-	// } else if (speed == 45.0) {
-	// torqueToUse = 48.640;
-	// } else if (speed == 46.0) {
-	// torqueToUse = (48.640 + 35.855) / 2;
-	// } else if (speed == 47.0) {
-	// torqueToUse = 35.855;
-	// } else if (speed == 48.0) {
-	// torqueToUse = 31.130;
-	// } else if (speed == 49.0) {
-	// torqueToUse = (31.130 + 51.141) / 2;
-	// } else if (speed == 50.0) {
-	// torqueToUse = 51.141;
-	// } else if (speed == 51.0) {
-	// torqueToUse = 60.036;
-	// } else if (speed == 52.0) {
-	// torqueToUse = (60.036 + 41.803) / 2;
-	// } else if (speed == 53.0) {
-	// torqueToUse = 41.803;
-	// } else if (speed == 54.0) {
-	// torqueToUse = 60.345;
-	// } else if (speed == 55.0) {
-	// torqueToUse = 60.345;
-	// } else if (speed == 56.0) {
-	// torqueToUse = 60.345;
-	// } else if (speed == 57.0) {
-	// torqueToUse = 60.345;
-	// } else if (speed == 58.0) {
-	// torqueToUse = 15.565;
-	// } else if (speed == 59.0) {
-	// torqueToUse = 60.345;
-	// } else if (speed == 60.0) {
-	// torqueToUse = 60.345;
-	// }
-	// return torqueToUse;
-	// }
 
 	/*
 	 * sets up the number formats for each entry/display field
@@ -438,7 +438,7 @@ public class BSFCgui implements ActionListener {
 	// * loop to calculate mass and velocities
 	// */
 	// private void velocityLoop(double distance, double w, double T, double
-	// BSFC, double velocityVehicle) {
+	// BSFC, double velocityVehicle, double initialSpeed, double finalSpeed) {
 	// double wcruise = 0; // get these from csv
 	// double Tcruise = 0; // get these from csv
 	// double massVehicle = 1060.045; // (kg)
@@ -468,6 +468,10 @@ public class BSFCgui implements ActionListener {
 	// System.out.println("Speed too low or too high.");
 	// }
 	// }
+
+	/*
+	 * cruising torque solve y = .0212x where y = torque, x = rpm
+	 */
 
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
