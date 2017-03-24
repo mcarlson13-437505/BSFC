@@ -7,19 +7,17 @@ import javax.swing.*;
 public class BSFCgui implements ActionListener {
 	// data fields
 	private JFrame frame;
-	private JLabel initialSpeedLabel, finalSpeedLabel, distanceLabel, massLabel, mpgLabel, volumeLabel;
+	private JLabel initialSpeedLabel, finalSpeedLabel, massLabel, mpgLabel, volumeLabel;
 	private JLabel speedRangeLabel;
 	private JLabel spacing;
 	private static String speedRangeLabelText = "    (Whole #'s between 30 and 60 MPH)";
 	private static String initialSpeedLabelText = "Enter Initial Speed (MPH): ";
 	private static String finalSpeedLabelText = "Enter Final Speed (MPH): ";
-	private static String distanceLabelText = "Enter Distance travelled (mi): ";
 	private static String massLabelText = "Mass of fuel consumed (kg): ";
 	private static String mpgLabelText = "MPG for this trip: ";
 	private static String volumeLabelText = "Volume of fuel consumed (gallons): ";
-	public JFormattedTextField initialSpeedField, finalSpeedField, distanceField, massField, mpgField,
-			volumeField;
-	private NumberFormat initialSpeedFormat, finalSpeedFormat, massFormat, distanceFormat, mpgFormat, volumeFormat;
+	public JFormattedTextField initialSpeedField, finalSpeedField, massField, mpgField, volumeField;
+	private NumberFormat initialSpeedFormat, finalSpeedFormat, massFormat, mpgFormat, volumeFormat;
 	private JButton calcButton = new JButton("Calculate");
 	private JButton clearButton = new JButton("Clear Fields");
 
@@ -85,7 +83,7 @@ public class BSFCgui implements ActionListener {
 	private void valueGrabber() {
 		double initialSpeed = (long) initialSpeedField.getValue();
 		double finalSpeed = (long) finalSpeedField.getValue();
-		if (initialSpeed < 30 || finalSpeed > 60) {
+		if (initialSpeed < 30 || finalSpeed > 60 || initialSpeed > finalSpeed) {
 			JOptionPane.showMessageDialog(null, "Invalid speed input. Program will re-launch.", "ERROR",
 					JOptionPane.WARNING_MESSAGE);
 			clearButtonAction();
@@ -110,21 +108,22 @@ public class BSFCgui implements ActionListener {
 			}
 		}
 		System.out.println("Index: " + index);
-		System.out.println("Speed: " + initialSpeed);
+		System.out.println("Initial Speed: " + initialSpeed);
+		System.out.println("Final Speed: " + finalSpeed);
 		int rpm = rpmArray[index];
 		// finds the average of torques within that array for calculations
-		double torqueToUse = torqueGrabber(initialSpeed);
+		double torqueToUse = grabTorque();
 		System.out.println("Torque: " + torqueToUse);
 		double bsfc = bsfcArray[index];
 		System.out.println("BSFC: " + bsfc);
-		double distance = (long) distanceField.getValue();
+		double distance = 0;
 		double massConsumed = calculateMass(initialSpeed, distance, rpm, bsfc, torqueToUse);
 		double volumeConsumed = calculateVolume(massConsumed);
 		double mpg = calculateMPG(massConsumed, distance);
 		System.out.println("RPM: " + rpm);
 		System.out.println("Mass consumed: " + massConsumed);
 		System.out.println("Volume consumed: " + volumeConsumed);
-		System.out.println("MPG: " + mpg + "\n");
+		System.out.println("MPG: " + mpg);
 		massField.setValue(massConsumed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
@@ -132,6 +131,7 @@ public class BSFCgui implements ActionListener {
 		// velocityLoop(distance, rpm, torque, bsfc, speed);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createTorqueDropDown() {
 		String[] torqueDropStrings = { "          Slow", "          Moderate", "          Quick" };
 		torqueDropDown = new JComboBox(torqueDropStrings);
@@ -140,73 +140,73 @@ public class BSFCgui implements ActionListener {
 	/*
 	 * grabs the correct average torque from specified array
 	 */
-	private double torqueGrabber(double speed) {
-		double torqueToUse = 0;
-		if (speed == 30.0) {
-			torqueToUse = 54.847;
-		} else if (speed == 31.0) {
-			torqueToUse = 28.906;
-		} else if (speed == 32.0) {
-			torqueToUse = 52.571;
-		} else if (speed == 33.0) {
-			torqueToUse = 40.024;
-		} else if (speed == 34.0) {
-			torqueToUse = 42.306;
-		} else if (speed == 35.0) {
-			torqueToUse = 39.246;
-		} else if (speed == 36.0) {
-			torqueToUse = 41.506;
-		} else if (speed == 37.0) {
-			torqueToUse = 40.024;
-		} else if (speed == 38.0) {
-			torqueToUse = (40.024 + 55.959) / 2;
-		} else if (speed == 39.0) {
-			torqueToUse = 55.959;
-		} else if (speed == 40.0) {
-			torqueToUse = 31.685;
-		} else if (speed == 41.0) {
-			torqueToUse = 20.012;
-		} else if (speed == 42.0) {
-			torqueToUse = 42.988;
-		} else if (speed == 43.0) {
-			torqueToUse = 23.625;
-		} else if (speed == 44.0) {
-			torqueToUse = 56.700;
-		} else if (speed == 45.0) {
-			torqueToUse = 48.640;
-		} else if (speed == 46.0) {
-			torqueToUse = (48.640 + 35.855) / 2;
-		} else if (speed == 47.0) {
-			torqueToUse = 35.855;
-		} else if (speed == 48.0) {
-			torqueToUse = 31.130;
-		} else if (speed == 49.0) {
-			torqueToUse = (31.130 + 51.141) / 2;
-		} else if (speed == 50.0) {
-			torqueToUse = 51.141;
-		} else if (speed == 51.0) {
-			torqueToUse = 60.036;
-		} else if (speed == 52.0) {
-			torqueToUse = (60.036 + 41.803) / 2;
-		} else if (speed == 53.0) {
-			torqueToUse = 41.803;
-		} else if (speed == 54.0) {
-			torqueToUse = 60.345;
-		} else if (speed == 55.0) {
-			torqueToUse = 60.345;
-		} else if (speed == 56.0) {
-			torqueToUse = 60.345;
-		} else if (speed == 57.0) {
-			torqueToUse = 60.345;
-		} else if (speed == 58.0) {
-			torqueToUse = 15.565;
-		} else if (speed == 59.0) {
-			torqueToUse = 60.345;
-		} else if (speed == 60.0) {
-			torqueToUse = 60.345;
-		}
-		return torqueToUse;
-	}
+	// private double torqueGrabber(double speed) {
+	// double torqueToUse = 0;
+	// if (speed == 30.0) {
+	// torqueToUse = 54.847;
+	// } else if (speed == 31.0) {
+	// torqueToUse = 28.906;
+	// } else if (speed == 32.0) {
+	// torqueToUse = 52.571;
+	// } else if (speed == 33.0) {
+	// torqueToUse = 40.024;
+	// } else if (speed == 34.0) {
+	// torqueToUse = 42.306;
+	// } else if (speed == 35.0) {
+	// torqueToUse = 39.246;
+	// } else if (speed == 36.0) {
+	// torqueToUse = 41.506;
+	// } else if (speed == 37.0) {
+	// torqueToUse = 40.024;
+	// } else if (speed == 38.0) {
+	// torqueToUse = (40.024 + 55.959) / 2;
+	// } else if (speed == 39.0) {
+	// torqueToUse = 55.959;
+	// } else if (speed == 40.0) {
+	// torqueToUse = 31.685;
+	// } else if (speed == 41.0) {
+	// torqueToUse = 20.012;
+	// } else if (speed == 42.0) {
+	// torqueToUse = 42.988;
+	// } else if (speed == 43.0) {
+	// torqueToUse = 23.625;
+	// } else if (speed == 44.0) {
+	// torqueToUse = 56.700;
+	// } else if (speed == 45.0) {
+	// torqueToUse = 48.640;
+	// } else if (speed == 46.0) {
+	// torqueToUse = (48.640 + 35.855) / 2;
+	// } else if (speed == 47.0) {
+	// torqueToUse = 35.855;
+	// } else if (speed == 48.0) {
+	// torqueToUse = 31.130;
+	// } else if (speed == 49.0) {
+	// torqueToUse = (31.130 + 51.141) / 2;
+	// } else if (speed == 50.0) {
+	// torqueToUse = 51.141;
+	// } else if (speed == 51.0) {
+	// torqueToUse = 60.036;
+	// } else if (speed == 52.0) {
+	// torqueToUse = (60.036 + 41.803) / 2;
+	// } else if (speed == 53.0) {
+	// torqueToUse = 41.803;
+	// } else if (speed == 54.0) {
+	// torqueToUse = 60.345;
+	// } else if (speed == 55.0) {
+	// torqueToUse = 60.345;
+	// } else if (speed == 56.0) {
+	// torqueToUse = 60.345;
+	// } else if (speed == 57.0) {
+	// torqueToUse = 60.345;
+	// } else if (speed == 58.0) {
+	// torqueToUse = 15.565;
+	// } else if (speed == 59.0) {
+	// torqueToUse = 60.345;
+	// } else if (speed == 60.0) {
+	// torqueToUse = 60.345;
+	// }
+	// return torqueToUse;
+	// }
 
 	/*
 	 * sets up the number formats for each entry/display field
@@ -215,7 +215,6 @@ public class BSFCgui implements ActionListener {
 		initialSpeedFormat = NumberFormat.getNumberInstance();
 		finalSpeedFormat = NumberFormat.getNumberInstance();
 		massFormat = NumberFormat.getNumberInstance();
-		distanceFormat = NumberFormat.getNumberInstance();
 		mpgFormat = NumberFormat.getNumberInstance();
 		volumeFormat = NumberFormat.getNumberInstance();
 	}
@@ -228,7 +227,6 @@ public class BSFCgui implements ActionListener {
 		labelPane.add(initialSpeedLabel);
 		labelPane.add(finalSpeedLabel);
 		labelPane.add(speedRangeLabel);
-		labelPane.add(distanceLabel);
 		labelPane.add(torqueLabel);
 		labelPane.add(massLabel);
 		labelPane.add(volumeLabel);
@@ -237,7 +235,6 @@ public class BSFCgui implements ActionListener {
 		fieldPane.add(initialSpeedField);
 		fieldPane.add(finalSpeedField);
 		fieldPane.add(spacing);
-		fieldPane.add(distanceField);
 		fieldPane.add(torqueDropDown);
 		fieldPane.add(massField);
 		fieldPane.add(volumeField);
@@ -267,7 +264,6 @@ public class BSFCgui implements ActionListener {
 		speedRangeLabel = new JLabel(speedRangeLabelText);
 		speedRangeLabel.setForeground(Color.RED);
 		spacing = new JLabel("           ");
-		distanceLabel = new JLabel(distanceLabelText);
 		torqueLabel = new JLabel("Select acceleration style: ");
 		massLabel = new JLabel(massLabelText);
 		volumeLabel = new JLabel(volumeLabelText);
@@ -280,7 +276,6 @@ public class BSFCgui implements ActionListener {
 	private void pairLabelsAndFields() {
 		initialSpeedLabel.setLabelFor(initialSpeedField);
 		finalSpeedLabel.setLabelFor(finalSpeedField);
-		distanceLabel.setLabelFor(distanceField);
 		torqueLabel.setLabelFor(torqueDropDown);
 		massLabel.setLabelFor(massField);
 		volumeLabel.setLabelFor(volumeField);
@@ -309,6 +304,44 @@ public class BSFCgui implements ActionListener {
 	}
 
 	/*
+	 * grabs correct torque based on acceleration style and input speeds
+	 */
+	private double grabTorque() {
+		double torqueToUse = 0;
+		String choice = (String) torqueDropDown.getSelectedItem();
+		if (choice.equals("          Slow")) {
+			torqueToUse = slowAcceleration();
+		} else if (choice.equals("          Moderate")) {
+			torqueToUse = moderateAcceleration();
+		} else if (choice.equals("          Quick")) {
+			torqueToUse = quickAcceleration();
+		} else {
+			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
+					JOptionPane.WARNING_MESSAGE);
+		}
+		System.out.println("Choice: " + choice);
+		return torqueToUse;
+	}
+
+	private double quickAcceleration() {
+		double torqueToUse = 0;
+
+		return torqueToUse;
+	}
+
+	private double moderateAcceleration() {
+		double torqueToUse = 0;
+
+		return torqueToUse;
+	}
+
+	private double slowAcceleration() {
+		double torqueToUse = 0;
+
+		return torqueToUse;
+	}
+
+	/*
 	 * sets the formatted text fields
 	 */
 	public void setUpFields() {
@@ -316,8 +349,6 @@ public class BSFCgui implements ActionListener {
 		initialSpeedField.setColumns(10);
 		finalSpeedField = new JFormattedTextField(finalSpeedFormat);
 		finalSpeedField.setColumns(10);
-		distanceField = new JFormattedTextField(distanceFormat);
-		distanceField.setColumns(10);
 		massField = new JFormattedTextField(massFormat);
 		massField.setColumns(10);
 		massField.setEditable(false);
@@ -348,6 +379,7 @@ public class BSFCgui implements ActionListener {
 		Object source = event.getSource();
 		if (source.equals(calcButton)) {
 			valueGrabber();
+			grabTorque();
 		} else {
 			clearButtonAction();
 		}
@@ -377,6 +409,8 @@ public class BSFCgui implements ActionListener {
 	 * calculates mpg for the trip
 	 */
 	private double calculateMPG(double massConsumed, double distance) {
+		// TODO: figure out way to get distance from integral based on time and
+		// speed
 		double mpg = 0;
 		double poundMass = massConsumed * 2.20462; // kg to lb
 		double volume = poundMass / 6.94; // in gallons, 6.94 = density diesel
@@ -389,6 +423,7 @@ public class BSFCgui implements ActionListener {
 	 * calculates mass consumed and returns the value as a long
 	 */
 	private double calculateMass(double speed, double distance, double rpm, double bsfc, double torque) {
+		// TODO: pass distance from mpg method
 		double mass = 0;
 		double bsfc1 = bsfc / 3600000; // converts to g/s
 		double rpm1 = rpm * (2 * Math.PI / 60);
