@@ -130,21 +130,6 @@ public class BSFCgui implements ActionListener {
 		addActionListeners();
 	}
 
-	private double findBsfcValues() {
-		return 0;
-
-	}
-
-	private double findTorqueValues() {
-		return 0;
-
-	}
-
-	private int findRpmValues() {
-		return 0;
-
-	}
-
 	/*
 	 * grab values in order to calculate
 	 */
@@ -180,12 +165,12 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Initial Speed: " + initialSpeed);
 		System.out.println("Final Speed: " + finalSpeed);
 		int rpm = rpmArray[index];
-		int rpmToUse = findRpmValues();
+		int rpmToUse = grabRpm(initialSpeed);
 		// finds the average of torques within that array for calculations
-		double torqueToUse = findTorqueValues();
+		double torqueToUse = grabTorque(initialSpeed);
 		System.out.println("Torque: " + torqueToUse);
 		double bsfc = bsfcArray[index];
-		double bsfcToUse = findBsfcValues();
+		double bsfcToUse = grabBsfc(initialSpeed);
 		System.out.println("BSFC: " + bsfcToUse);
 		double distance = 0;
 		double massConsumed = calculateMass(initialSpeed, distance, rpm, bsfc, torqueToUse);
@@ -306,19 +291,19 @@ public class BSFCgui implements ActionListener {
 	/*
 	 * grabs correct torque based on acceleration style and input speeds
 	 */
-	private double grabTorque() {
+	private double grabTorque(double speed) {
 		double torqueToUse = 0;
-		double[] array = findArray();
+		double[] array = findTorqueArray(speed);
 		String choiceSlow = "          Slow";
 		String choiceMod = "          Moderate";
 		String choiceQuick = "          Quick";
 		String choice = (String) torqueDropDown.getSelectedItem();
 		if (choice.equals(choiceSlow)) {
-			torqueToUse = slowAcceleration(array,1);
+			torqueToUse = slowAcceleration(array);
 		} else if (choice.equals(choiceMod)) {
-			torqueToUse = moderateAcceleration(array,2);
+			torqueToUse = moderateAcceleration(array);
 		} else if (choice.equals(choiceQuick)) {
-			torqueToUse = quickAcceleration(array,3);
+			torqueToUse = quickAcceleration(array);
 		} else {
 			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
 					JOptionPane.WARNING_MESSAGE);
@@ -326,57 +311,344 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Choice: " + choice);
 		return torqueToUse;
 	}
-	
-	private int grabRpm() {
-		return 0;
-	}
-	
-	private double findBsfc() {
-		return 0;
+
+	private int grabRpm(double speed) {
+		int rpmToUse = 0;
+		int[] array = findRpmArray(speed);
+		String choiceSlow = "          Slow";
+		String choiceMod = "          Moderate";
+		String choiceQuick = "          Quick";
+		String choice = (String) torqueDropDown.getSelectedItem();
+		if (choice.equals(choiceSlow)) {
+			rpmToUse = slowAccelerationRpm(array);
+		} else if (choice.equals(choiceMod)) {
+			rpmToUse = moderateAccelerationRpm(array);
+		} else if (choice.equals(choiceQuick)) {
+			rpmToUse = quickAccelerationRpm(array);
+		} else {
+			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
+					JOptionPane.WARNING_MESSAGE);
+		}
+		return rpmToUse;
 	}
 
-	private double quickAcceleration(double[] array, int x) {
-		double torqueToUse = max(array);
-		return torqueToUse;
+	private int quickAccelerationRpm(int[] array) {
+		int valueToUse = max(array);
+		return valueToUse;
 	}
 
-	private double[] findArray() {
-		double[] arrayToUse;
-		
+	private int max(int[] array) {
+		int valueToUse = 0;
+		int max = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] > max) {
+				max = array[i];
+			}
+		}
+		valueToUse = max;
+		return valueToUse;
+	}
+
+	private int moderateAccelerationRpm(int[] array) {
+		int valueToUse = mid(array);
+		return valueToUse;
+	}
+
+	private int mid(int[] array) {
+		int valueToUse = 0;
+		int mid = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] <= mid || array[i] >= mid) {
+				mid = array[i];
+			}
+		}
+		valueToUse = mid;
+		return valueToUse;
+	}
+
+	private int slowAccelerationRpm(int[] array) {
+		int valueToUse = min(array);
+		return valueToUse;
+	}
+
+	private int min(int[] array) {
+		int valueToUse = 0;
+		int min = 1000000;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] < min) {
+				min = array[i];
+			}
+		}
+		valueToUse = min;
+		return valueToUse;
+	}
+
+	private double grabBsfc(double speed) {
+		double bsfcToUse = 0;
+		double[] array = findBsfcArray(speed);
+		String choiceSlow = "          Slow";
+		String choiceMod = "          Moderate";
+		String choiceQuick = "          Quick";
+		String choice = (String) torqueDropDown.getSelectedItem();
+		if (choice.equals(choiceSlow)) {
+			bsfcToUse = slowAcceleration(array);
+		} else if (choice.equals(choiceMod)) {
+			bsfcToUse = moderateAcceleration(array);
+		} else if (choice.equals(choiceQuick)) {
+			bsfcToUse = quickAcceleration(array);
+		} else {
+			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
+					JOptionPane.WARNING_MESSAGE);
+		}
+		return bsfcToUse;
+	}
+
+	private double quickAcceleration(double[] array) {
+		double valueToUse = max(array);
+		return valueToUse;
+	}
+
+	private double[] findBsfcArray(double speed) {
+		double[] arrayToUse = {};
+		if (speed == 30.0) {
+			arrayToUse = b30;
+		} else if (speed == 31.0) {
+			arrayToUse = b31;
+		} else if (speed == 32.0) {
+			arrayToUse = b32;
+		} else if (speed == 33.0) {
+			arrayToUse = b33;
+		} else if (speed == 34.0) {
+			arrayToUse = b34;
+		} else if (speed == 35.0) {
+			arrayToUse = b35;
+		} else if (speed == 36.0) {
+			arrayToUse = b36;
+		} else if (speed == 37.0) {
+			arrayToUse = b37;
+		} else if (speed == 38.0) {
+			arrayToUse = b39;
+		} else if (speed == 39.0) {
+			arrayToUse = b39;
+		} else if (speed == 40.0) {
+			arrayToUse = b40;
+		} else if (speed == 41.0) {
+			arrayToUse = b41;
+		} else if (speed == 42.0) {
+			arrayToUse = b42;
+		} else if (speed == 43.0) {
+			arrayToUse = b43;
+		} else if (speed == 44.0) {
+			arrayToUse = b44;
+		} else if (speed == 45.0) {
+			arrayToUse = b45;
+		} else if (speed == 46.0) {
+			arrayToUse = b47;
+		} else if (speed == 47.0) {
+			arrayToUse = b47;
+		} else if (speed == 48.0) {
+			arrayToUse = b48;
+		} else if (speed == 49.0) {
+			arrayToUse = b48;
+		} else if (speed == 50.0) {
+			arrayToUse = b50;
+		} else if (speed == 51.0) {
+			arrayToUse = b51;
+		} else if (speed == 53.0) {
+			arrayToUse = b53;
+		} else if (speed == 54.0) {
+			arrayToUse = b53;
+		} else if (speed == 55.0) {
+			arrayToUse = b53;
+		} else if (speed == 56.0) {
+			arrayToUse = b58;
+		} else if (speed == 57.0) {
+			arrayToUse = b58;
+		} else if (speed == 58.0) {
+			arrayToUse = b58;
+		} else if (speed == 59.0) {
+			arrayToUse = b58;
+		} else if (speed == 60.0) {
+			arrayToUse = b58;
+		}
 		return arrayToUse;
 	}
-	
-	private int[] findRpmArray() {
-		int[] arrayToUse;
-		
+
+	private double[] findTorqueArray(double speed) {
+		double[] arrayToUse = {};
+		if (speed == 30.0) {
+			arrayToUse = t30;
+		} else if (speed == 31.0) {
+			arrayToUse = t31;
+		} else if (speed == 32.0) {
+			arrayToUse = t32;
+		} else if (speed == 33.0) {
+			arrayToUse = t33;
+		} else if (speed == 34.0) {
+			arrayToUse = t34;
+		} else if (speed == 35.0) {
+			arrayToUse = t35;
+		} else if (speed == 36.0) {
+			arrayToUse = t36;
+		} else if (speed == 37.0) {
+			arrayToUse = t37;
+		} else if (speed == 38.0) {
+			arrayToUse = t39;
+		} else if (speed == 39.0) {
+			arrayToUse = t39;
+		} else if (speed == 40.0) {
+			arrayToUse = t40;
+		} else if (speed == 41.0) {
+			arrayToUse = t41;
+		} else if (speed == 42.0) {
+			arrayToUse = t42;
+		} else if (speed == 43.0) {
+			arrayToUse = t43;
+		} else if (speed == 44.0) {
+			arrayToUse = t44;
+		} else if (speed == 45.0) {
+			arrayToUse = t45;
+		} else if (speed == 46.0) {
+			arrayToUse = t47;
+		} else if (speed == 47.0) {
+			arrayToUse = t47;
+		} else if (speed == 48.0) {
+			arrayToUse = t48;
+		} else if (speed == 49.0) {
+			arrayToUse = t48;
+		} else if (speed == 50.0) {
+			arrayToUse = t50;
+		} else if (speed == 51.0) {
+			arrayToUse = t51;
+		} else if (speed == 53.0) {
+			arrayToUse = t53;
+		} else if (speed == 54.0) {
+			arrayToUse = t53;
+		} else if (speed == 55.0) {
+			arrayToUse = t53;
+		} else if (speed == 56.0) {
+			arrayToUse = t58;
+		} else if (speed == 57.0) {
+			arrayToUse = t58;
+		} else if (speed == 58.0) {
+			arrayToUse = t58;
+		} else if (speed == 59.0) {
+			arrayToUse = t58;
+		} else if (speed == 60.0) {
+			arrayToUse = t58;
+		}
 		return arrayToUse;
 	}
 
-	private double moderateAcceleration(double[] array, int x) {
-		double torqueToUse = mid(array); 
-		return torqueToUse;
+	private int[] findRpmArray(double speed) {
+		int[] arrayToUse = {};
+		if (speed == 30.0) {
+			arrayToUse = r30;
+		} else if (speed == 31.0) {
+			arrayToUse = r31;
+		} else if (speed == 32.0) {
+			arrayToUse = r32;
+		} else if (speed == 33.0) {
+			arrayToUse = r33;
+		} else if (speed == 34.0) {
+			arrayToUse = r34;
+		} else if (speed == 35.0) {
+			arrayToUse = r35;
+		} else if (speed == 36.0) {
+			arrayToUse = r36;
+		} else if (speed == 37.0) {
+			arrayToUse = r37;
+		} else if (speed == 38.0) {
+			arrayToUse = r39;
+		} else if (speed == 39.0) {
+			arrayToUse = r39;
+		} else if (speed == 40.0) {
+			arrayToUse = r40;
+		} else if (speed == 41.0) {
+			arrayToUse = r41;
+		} else if (speed == 42.0) {
+			arrayToUse = r42;
+		} else if (speed == 43.0) {
+			arrayToUse = r43;
+		} else if (speed == 44.0) {
+			arrayToUse = r44;
+		} else if (speed == 45.0) {
+			arrayToUse = r45;
+		} else if (speed == 46.0) {
+			arrayToUse = r47;
+		} else if (speed == 47.0) {
+			arrayToUse = r47;
+		} else if (speed == 48.0) {
+			arrayToUse = r48;
+		} else if (speed == 49.0) {
+			arrayToUse = r48;
+		} else if (speed == 50.0) {
+			arrayToUse = r50;
+		} else if (speed == 51.0) {
+			arrayToUse = r51;
+		} else if (speed == 53.0) {
+			arrayToUse = r53;
+		} else if (speed == 54.0) {
+			arrayToUse = r53;
+		} else if (speed == 55.0) {
+			arrayToUse = r53;
+		} else if (speed == 56.0) {
+			arrayToUse = r58;
+		} else if (speed == 57.0) {
+			arrayToUse = r58;
+		} else if (speed == 58.0) {
+			arrayToUse = r58;
+		} else if (speed == 59.0) {
+			arrayToUse = r58;
+		} else if (speed == 60.0) {
+			arrayToUse = r58;
+		}
+		return arrayToUse;
 	}
 
-	private double slowAcceleration(double[] array, int x) {
-		double torqueToUse = min(array);
-		return torqueToUse;
+	private double moderateAcceleration(double[] array) {
+		double valueToUse = mid(array);
+		return valueToUse;
 	}
-	
+
+	private double slowAcceleration(double[] array) {
+		double valueToUse = min(array);
+		return valueToUse;
+	}
+
 	private double min(double[] array) {
-		
 		double valueToUse = 0;
+		double min = 1000000;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] < min) {
+				min = array[i];
+			}
+		}
+		valueToUse = min;
 		return valueToUse;
 	}
-	
+
 	private double mid(double[] array) {
-		
 		double valueToUse = 0;
+		double mid = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] <= mid || array[i] >= mid) {
+				mid = array[i];
+			}
+		}
+		valueToUse = mid;
 		return valueToUse;
 	}
-	
+
 	private double max(double[] array) {
-		
 		double valueToUse = 0;
+		double max = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] > max) {
+				max = array[i];
+			}
+		}
+		valueToUse = max;
 		return valueToUse;
 	}
 
@@ -418,7 +690,6 @@ public class BSFCgui implements ActionListener {
 		Object source = event.getSource();
 		if (source.equals(calcButton)) {
 			valueGrabber();
-			grabTorque();
 		} else {
 			clearButtonAction();
 		}
