@@ -124,8 +124,6 @@ public class BSFCgui implements ActionListener {
 		System.out.println("Torque: " + torqueToUse);
 		double bsfcToUse = grabBsfc(initialSpeed);
 		System.out.println("BSFC: " + bsfcToUse + "\n");
-		initialSpeed = initialSpeed * 0.44704; // mph to meter/sec
-		finalSpeed = finalSpeed * 0.44704; // mph to meter/sec
 		velocityLoop(rpmToUse, torqueToUse, bsfcToUse, initialSpeed, finalSpeed);
 	}
 
@@ -691,27 +689,28 @@ public class BSFCgui implements ActionListener {
 		int wcruise = getCruiseRpm(initialSpeed, finalSpeed);
 		double Tcruise = getCruiseTorque(initialSpeed, finalSpeed);
 		double massVehicle = 1060.045; // (kg)
-		double velocityOld = initialSpeed;
+		double currentV = initialSpeed * .44704; //to meter/sec
 		double Dt = .1;
 		double sumTime = 0;
 		double Dvelocity = 0;
-		double velocityNew = velocityOld + Dvelocity;
+		double finalV = currentV*.44704 + Dvelocity;
 		double dist = 0;
 		double mass = 0;
 		double Dmass;
-
+		Dvelocity = (rpm * torque - (wcruise * Tcruise))*Dt / (massVehicle * currentV);
+		System.out.println("D velocity: " + Dvelocity);
 		System.out.println("Dist: " + dist);
-		System.out.println("Initial Speed: " + velocityOld);
+		System.out.println("Initial Speed: " + currentV);
 		//infinite loop!!!!!!!!!!!********HELP
-			while (velocityOld <= velocityNew) {
+			while (initialSpeed <= finalSpeed) {
 				System.out.println("\n\n");
-				Dvelocity = (rpm * torque - (wcruise * Tcruise)) / (massVehicle * velocityOld);
-				System.out.println("Velocity old: " + velocityOld);
-				velocityNew = velocityOld + Dvelocity;
-				velocityOld = velocityNew;
+				Dvelocity = (rpm * torque - (wcruise * Tcruise))*Dt / (massVehicle * currentV);
+				System.out.println("Velocity old: " + currentV);
+				finalV = currentV + Dvelocity;
+				currentV = finalV;
 				System.out.println("D velocity: " + Dvelocity);
-				System.out.println("Velocity new: " + velocityNew);
-				dist = dist + velocityNew * Dt; // = SUM(velocity*Dt);
+				System.out.println("Velocity new: " + finalV);
+				dist = dist + finalV * Dt; // = SUM(velocity*Dt);
 				System.out.println("dist: " + dist);
 				sumTime = sumTime + Dt;
 				System.out.println("Sum time: " + sumTime);
@@ -719,8 +718,11 @@ public class BSFCgui implements ActionListener {
 				System.out.println("Dmass: " + Dmass);
 				mass = mass + Dmass;
 				System.out.println("Mass: " + mass);
+				rpm = grabRpm(currentV);
+				bsfc = grabBsfc(currentV);
+				torque = grabTorque(currentV);
 			}
-		double massConsumed = calculateMass(velocityNew, dist, rpm, bsfc, torque);
+		double massConsumed = calculateMass(finalV, dist, rpm, bsfc, torque);
 		double volumeConsumed = calculateVolume(massConsumed);
 		double mpg = calculateMPG(massConsumed, dist);
 		System.out.println("Mass consumed: " + massConsumed);
