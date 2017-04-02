@@ -111,19 +111,9 @@ public class BSFCgui implements ActionListener {
 					JOptionPane.WARNING_MESSAGE);
 			clearButtonAction();
 		}
-		double upper = initialSpeed + (initialSpeed * .05);
-		double lower = initialSpeed - (initialSpeed * .05);
-		System.out.println("Upper five %: " + upper);
-		System.out.println("Lower five %: " + lower);
-		System.out.println("Initial Speed: " + initialSpeed);
-		System.out.println("Final Speed: " + finalSpeed);
 		int rpmToUse = grabRpm(initialSpeed);
-		System.out.println("RPM: " + rpmToUse);
-		// finds the average of torques within that array for calculations
 		double torqueToUse = grabTorque(initialSpeed);
-		System.out.println("Torque: " + torqueToUse);
 		double bsfcToUse = grabBsfc(initialSpeed);
-		System.out.println("BSFC: " + bsfcToUse + "\n");
 		velocityLoop(rpmToUse, torqueToUse, bsfcToUse, initialSpeed, finalSpeed);
 	}
 
@@ -248,7 +238,6 @@ public class BSFCgui implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
 					JOptionPane.WARNING_MESSAGE);
 		}
-		System.out.println("Choice: " + choice);
 		return torqueToUse;
 	}
 
@@ -684,53 +673,59 @@ public class BSFCgui implements ActionListener {
 	/*
 	 * loop to calculate mass and velocities
 	 */
-	private void velocityLoop(int rpm, double torque, double bsfc, double initialSpeed,
-			double finalSpeed) {
-		int wcruise = getCruiseRpm(initialSpeed, finalSpeed);
-		double Tcruise = getCruiseTorque(initialSpeed, finalSpeed);
-		double massVehicle = 1060.045; // (kg)
-		double currentV = initialSpeed * .44704; //to meter/sec
-		double Dt = .1;
-		double sumTime = 0;
-		double Dvelocity = 0;
-		double finalV = currentV*.44704 + Dvelocity;
+	private void velocityLoop(int rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
+		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
+		double Wc = Tc / .0212;
+		double mVehicle = 1060.045; // (kg)
+		double deltaT = .01;
+		int sentinel = 1;
+		double deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * initialSpeed);
+		double finalV = finalSpeed;
+		double twoPercent = finalV - (finalV * .02);
+		double currentV = initialSpeed;
 		double dist = 0;
-		double mass = 0;
-		double Dmass;
-		Dvelocity = (rpm * torque - (wcruise * Tcruise))*Dt / (massVehicle * currentV);
-		System.out.println("D velocity: " + Dvelocity);
-		System.out.println("Dist: " + dist);
-		System.out.println("Initial Speed: " + currentV);
-		//infinite loop!!!!!!!!!!!********HELP
-			while (initialSpeed <= finalSpeed) {
-				System.out.println("\n\n");
-				Dvelocity = (rpm * torque - (wcruise * Tcruise))*Dt / (massVehicle * currentV);
-				System.out.println("Velocity old: " + currentV);
-				finalV = currentV + Dvelocity;
-				currentV = finalV;
-				System.out.println("D velocity: " + Dvelocity);
-				System.out.println("Velocity new: " + finalV);
-				dist = dist + finalV * Dt; // = SUM(velocity*Dt);
-				System.out.println("dist: " + dist);
-				sumTime = sumTime + Dt;
-				System.out.println("Sum time: " + sumTime);
-				Dmass = bsfc * rpm * torque * Dt;
-				System.out.println("Dmass: " + Dmass);
-				mass = mass + Dmass;
-				System.out.println("Mass: " + mass);
-				rpm = grabRpm(currentV);
-				bsfc = grabBsfc(currentV);
-				torque = grabTorque(currentV);
+		double massUsed = 0;
+		double deltaMass = 0;
+		
+		while (sentinel != -1) {
+			if(((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV) < 0) {
+				deltaV = (-1)*((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
+			} else {
+				deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
 			}
-		double massConsumed = calculateMass(finalV, dist, rpm, bsfc, torque);
-		double volumeConsumed = calculateVolume(massConsumed);
-		double mpg = calculateMPG(massConsumed, dist);
-		System.out.println("Mass consumed: " + massConsumed);
-		System.out.println("Volume consumed: " + volumeConsumed);
-		System.out.println("MPG: " + mpg);
-		massField.setValue(massConsumed);
-		volumeField.setValue(volumeConsumed);
-		mpgField.setValue(mpg);
+			currentV = currentV + deltaV;
+			dist = dist + (currentV * deltaT);
+			deltaMass = bsfc*rpm*torque*deltaT;
+			massUsed = massUsed + deltaMass;
+			
+			System.out.println("cruiseT: " + Tc);
+			System.out.println("cruiseW: " + Wc);
+			System.out.println("deltaV: " + deltaV);
+			System.out.println("currentV: " + currentV);
+			System.out.println("dist: " + dist);
+			System.out.println("deltaMass: " + deltaMass);
+			System.out.println("massUsed: " + massUsed);
+			System.out.println();
+			
+			rpm = grabRpm(currentV);
+			torque = grabTorque(currentV);
+			bsfc = grabBsfc(currentV);
+			Tc = getCruiseTorque(finalV, currentV);
+			Wc = Tc / .0212;
+
+			if (twoPercent >= finalSpeed || currentV > finalSpeed) {
+				sentinel = -1;
+			}
+		}
+		 double massConsumed = calculateMass(currentV, dist, rpm, bsfc, torque);
+		 double volumeConsumed = calculateVolume(massConsumed);
+		 double mpg = calculateMPG(massConsumed, dist);
+		 System.out.println("Mass consumed: " + massConsumed);
+		 System.out.println("Volume consumed: " + volumeConsumed);
+		 System.out.println("MPG: " + mpg);
+		 massField.setValue(massConsumed);
+		 volumeField.setValue(volumeConsumed);
+		 mpgField.setValue(mpg);
 	}
 
 	/*
@@ -761,32 +756,6 @@ public class BSFCgui implements ActionListener {
 			t = 31.6;
 		}
 		return t;
-	}
-
-	private int getCruiseRpm(double initialSpeed, double finalSpeed) {
-		int w = 0;
-		if (initialSpeed == 32 || finalSpeed == 32) {
-			w = w1;
-		} else if (initialSpeed == 34 || finalSpeed == 34) {
-			w = w2;
-		} else if (initialSpeed == 35 || finalSpeed == 35) {
-			w = w3;
-		} else if (initialSpeed == 43 || finalSpeed == 43) {
-			w = w5;
-		} else if (initialSpeed == 37 || finalSpeed == 37) {
-			w = w4;
-		} else if (initialSpeed == 45 || finalSpeed == 45) {
-			w = w6;
-		} else if (initialSpeed == 48 || finalSpeed == 48) {
-			w = w7;
-		} else if (initialSpeed == 51 || finalSpeed == 51) {
-			w = w8;
-		} else if (initialSpeed == 58 || finalSpeed == 58) {
-			w = w9;
-		} else {
-			w = 1870;
-		}
-		return w;
 	}
 
 	public static void main(String[] args) {
