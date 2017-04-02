@@ -63,20 +63,17 @@ public class BSFCgui implements ActionListener {
 			b34 = { 402.263044, 298.8411414, 527.0361828, 369.2176705, 305.4711334, 309.9572376, 332.9214856,
 					396.6373913, 341.9714598, 348.6949409, 314.6871073, 314.2601234, 309.7818193, 314.5635358,
 					303.2279129, 291.5523331, 322.5586923, 315.751814, 234.9573586 },
-			b35 = { 2558.746305, 418.0431635, 510.6226268, 1972.57751, 367.8577462, 200.4144411, 361.953447,
-					266.3824909, 311.5349385, 2.787823037, 2.900359013, 2.723902342, 170.087446, 199.9606165,
-					159.2726373, 209.1960286, 313.0357164, 337.1038441, 376.8120932, 127.9603326, 465.7022618,
-					109.1282783, 290.2838658, 261.0353289, 637.3135453, 275.9860469, 298.7523944, 0.6969557593,
-					288.1417599, 360.0490781 },
-			b36 = { 288.4549088, 286.6708485, 312.9681772 },
-			b37 = { 981.1239144, 3.905775914, 133.0333098, 431.9863351, 578.5478921 },
+			b35 = { 418.0431635, 510.6226268, 367.8577462, 200.4144411, 361.953447, 266.3824909, 311.5349385,
+					170.087446, 199.9606165, 159.2726373, 209.1960286, 313.0357164, 337.1038441, 376.8120932,
+					127.9603326, 465.7022618, 109.1282783, 290.2838658, 261.0353289, 637.3135453, 275.9860469,
+					298.7523944, 288.1417599, 360.0490781 },
+			b36 = { 288.4549088, 286.6708485, 312.9681772 }, b37 = { 133.0333098, 431.9863351, 578.5478921 },
 			b39 = { 282.8235391, 155.3576403, 305.4363554 }, b40 = { 781.8611823, 456.4035018 }, b41 = { 235.0504977 },
-			b42 = { 489.1955478, 445.1933793, 339.4200166 },
-			b43 = { 343.806749, 3.380571601, 3.319653893, 236.6540562 }, b44 = { 357.2653112 },
+			b42 = { 489.1955478, 445.1933793, 339.4200166 }, b43 = { 343.806749, 236.6540562 }, b44 = { 357.2653112 },
 			b45 = { 480.2915996, 419.5984822, 241.9421334, 422.3337333 },
-			b47 = { 278.7559509, 412.1860613, 348.7808646, 84.49258751 }, b48 = { 266.2313493 },
-			b50 = { 329.6000079, 329.4281517 }, b51 = { 4.232277366, 329.205822 },
-			b53 = { 478.6854764, 463.7623852, 316.2166033, 307.7263777, 179.5948322 }, b58 = { 744.5678257 };
+			b47 = { 278.7559509, 412.1860613, 348.7808646 }, b48 = { 266.2313493 }, b50 = { 329.6000079, 329.4281517 },
+			b51 = { 329.205822 }, b53 = { 478.6854764, 463.7623852, 316.2166033, 307.7263777, 179.5948322 },
+			b58 = { 744.5678257 };
 
 	@SuppressWarnings("rawtypes")
 	private JComboBox torqueDropDown;
@@ -671,13 +668,13 @@ public class BSFCgui implements ActionListener {
 	}
 
 	/*
-	 * loop to calculate mass and velocities
+	 * loop to calculate mass and velocities TODO: UNITS PROBLEM!!!!
 	 */
 	private void velocityLoop(int rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
 		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
 		double Wc = Tc / .0212;
 		double mVehicle = 1060.045; // (kg)
-		double deltaT = .01;
+		double deltaT = .1;
 		int sentinel = 1;
 		double deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * initialSpeed);
 		double finalV = finalSpeed;
@@ -686,18 +683,20 @@ public class BSFCgui implements ActionListener {
 		double dist = 0;
 		double massUsed = 0;
 		double deltaMass = 0;
-		
+		int count = 0;
+
 		while (sentinel != -1) {
-			if(((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV) < 0) {
-				deltaV = (-1)*((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
+			System.out.println(count);
+			if (((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV) < 0) {
+				deltaV = (-1) * ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
 			} else {
 				deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
 			}
 			currentV = currentV + deltaV;
-			dist = dist + (currentV * deltaT);
-			deltaMass = bsfc*rpm*torque*deltaT;
+			dist = (currentV * deltaT);
+			deltaMass = bsfc * rpm * torque * deltaT;
 			massUsed = massUsed + deltaMass;
-			
+
 			System.out.println("cruiseT: " + Tc);
 			System.out.println("cruiseW: " + Wc);
 			System.out.println("deltaV: " + deltaV);
@@ -706,7 +705,7 @@ public class BSFCgui implements ActionListener {
 			System.out.println("deltaMass: " + deltaMass);
 			System.out.println("massUsed: " + massUsed);
 			System.out.println();
-			
+
 			rpm = grabRpm(currentV);
 			torque = grabTorque(currentV);
 			bsfc = grabBsfc(currentV);
@@ -716,16 +715,16 @@ public class BSFCgui implements ActionListener {
 			if (twoPercent >= finalSpeed || currentV > finalSpeed) {
 				sentinel = -1;
 			}
+			count++;
 		}
-		 double massConsumed = calculateMass(currentV, dist, rpm, bsfc, torque);
-		 double volumeConsumed = calculateVolume(massConsumed);
-		 double mpg = calculateMPG(massConsumed, dist);
-		 System.out.println("Mass consumed: " + massConsumed);
-		 System.out.println("Volume consumed: " + volumeConsumed);
-		 System.out.println("MPG: " + mpg);
-		 massField.setValue(massConsumed);
-		 volumeField.setValue(volumeConsumed);
-		 mpgField.setValue(mpg);
+		double volumeConsumed = calculateVolume(massUsed);
+		double mpg = calculateMPG(massUsed, dist);
+		System.out.println("Mass consumed: " + massUsed);
+		System.out.println("Volume consumed: " + volumeConsumed);
+		System.out.println("MPG: " + mpg);
+		massField.setValue(massUsed);
+		volumeField.setValue(volumeConsumed);
+		mpgField.setValue(mpg);
 	}
 
 	/*
