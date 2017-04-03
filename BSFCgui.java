@@ -631,40 +631,19 @@ public class BSFCgui implements ActionListener {
 	}
 
 	/*
-	 * calculates volume of fuel consumed
+	 * calculates volume of fuel consumed during acceleration
 	 */
 	private double calculateVolume(double massConsumed) {
-		double poundMass = massConsumed * 2.20462; // kg to lb
-		double volume = poundMass / 6.002257; // in gallons, 6.002257 = density
-												// regular
-												// fuel (lb/gal)
-		return volume;
+		double poundMass = massConsumed * 0.00220462; // g to lb
+		return (poundMass / 6.183) / 1000;
 	}
 
 	/*
-	 * calculates mpg for the trip
+	 * calculates mpg for the acceleration
 	 */
-	private double calculateMPG(double massConsumed, double distance) {
-		double mpg = 0;
-		double poundMass = massConsumed * 2.20462; // kg to lb
-		double volume = poundMass / 6.94; // in gallons, 6.94 = density diesel
-											// fuel (lb/gal)
-		mpg = distance / volume;
+	private double calculateMPG(double distance, double volume) {
+		double mpg = distance / volume;
 		return mpg;
-	}
-
-	/*
-	 * calculates mass consumed and returns the value as a long
-	 */
-	private double calculateMass(double speed, double distance, double rpm, double bsfc, double torque) {
-		double mass = 0;
-		double bsfc1 = bsfc / 3600000; // converts to g/s
-		double rpm1 = rpm * (2 * Math.PI / 60);
-		speed = speed * 0.000277778; // convert mph to mi/sec
-		mass = (double) (bsfc1 * rpm1 * torque * distance);
-		mass = (double) (mass / speed);
-		mass = mass / 1000;
-		return mass;
 	}
 
 	/*
@@ -673,7 +652,7 @@ public class BSFCgui implements ActionListener {
 	// TODO: UNITS PROBLEM!!!!
 	private void velocityLoop(double rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
 		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
-		double Wc = Tc / .0212;
+		double Wc = (Tc / .0212) * (2 * Math.PI / 60);
 		double mVehicle = 1060.045; // (kg)
 		double deltaT = .1;
 		int sentinel = 1;
@@ -690,7 +669,7 @@ public class BSFCgui implements ActionListener {
 
 		while (sentinel != -1) {
 			if (((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV) < 0) {
-				deltaV = (-1) * ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
+				deltaV = (-1) * ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * (currentV * .000277778));
 			} else {
 				deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
 			}
@@ -721,8 +700,9 @@ public class BSFCgui implements ActionListener {
 			count++;
 		}
 		double volumeConsumed = calculateVolume(massUsed);
-		double mpg = calculateMPG(massUsed, dist);
-		System.out.println("Mass consumed: " + massUsed);
+		double mpg = calculateMPG(dist, volumeConsumed);
+		System.out.println("Mass consumed: " + massUsed / 1000); // passes mass
+																	// as grams
 		System.out.println("Volume consumed: " + volumeConsumed);
 		System.out.println("MPG: " + mpg);
 		massField.setValue(massUsed);
