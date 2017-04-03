@@ -668,53 +668,56 @@ public class BSFCgui implements ActionListener {
 	}
 
 	/*
-	 * loop to calculate mass and velocities TODO: UNITS PROBLEM!!!!
+	 * loop to calculate mass and velocities
 	 */
-	private void velocityLoop(int rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
+	// TODO: UNITS PROBLEM!!!!
+	private void velocityLoop(double rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
 		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
 		double Wc = Tc / .0212;
 		double mVehicle = 1060.045; // (kg)
 		double deltaT = .1;
 		int sentinel = 1;
-		double deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * initialSpeed);
+		bsfc = bsfc / 3600000;
+		rpm = rpm * (2 * Math.PI / 60);
+		double deltaV = 0;
 		double finalV = finalSpeed;
 		double twoPercent = finalV - (finalV * .02);
-		double currentV = initialSpeed;
+		double currentV = initialSpeed * .000277778;
 		double dist = 0;
 		double massUsed = 0;
-		double deltaMass = 0;
+		double deltaMass;
 		int count = 0;
 
 		while (sentinel != -1) {
-			System.out.println(count);
 			if (((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV) < 0) {
 				deltaV = (-1) * ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
 			} else {
 				deltaV = ((rpm * torque) - (Wc * Tc)) * deltaT / (mVehicle * currentV);
 			}
-			currentV = currentV + deltaV;
 			dist = (currentV * deltaT);
 			deltaMass = bsfc * rpm * torque * deltaT;
 			massUsed = massUsed + deltaMass;
+			massUsed = massUsed / 1000;
 
+			System.out.println(count);
 			System.out.println("cruiseT: " + Tc);
 			System.out.println("cruiseW: " + Wc);
-			System.out.println("deltaV: " + deltaV);
 			System.out.println("currentV: " + currentV);
+			System.out.println("deltaV: " + deltaV);
 			System.out.println("dist: " + dist);
 			System.out.println("deltaMass: " + deltaMass);
 			System.out.println("massUsed: " + massUsed);
 			System.out.println();
 
-			rpm = grabRpm(currentV);
-			torque = grabTorque(currentV);
-			bsfc = grabBsfc(currentV);
-			Tc = getCruiseTorque(finalV, currentV);
-			Wc = Tc / .0212;
-
 			if (twoPercent >= finalSpeed || currentV > finalSpeed) {
 				sentinel = -1;
 			}
+			currentV = currentV + deltaV;
+			rpm = grabRpm(currentV) * (2 * Math.PI / 60);
+			torque = grabTorque(currentV);
+			bsfc = grabBsfc(currentV) / 3600000;
+			Tc = getCruiseTorque(finalV, currentV);
+			Wc = Tc / .0212;
 			count++;
 		}
 		double volumeConsumed = calculateVolume(massUsed);
