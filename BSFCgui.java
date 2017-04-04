@@ -13,7 +13,7 @@ public class BSFCgui implements ActionListener {
 	private static String speedRangeLabelText = "    (Whole #'s between 30 and 60 MPH)";
 	private static String initialSpeedLabelText = "Enter Initial Speed (MPH): ";
 	private static String finalSpeedLabelText = "Enter Final Speed (MPH): ";
-	private static String massLabelText = "Mass of fuel consumed (kg): ";
+	private static String massLabelText = "Mass of fuel consumed (g): ";
 	private static String mpgLabelText = "MPG for this trip: ";
 	private static String volumeLabelText = "Volume of fuel consumed (gallons): ";
 	public JFormattedTextField initialSpeedField, finalSpeedField, massField, mpgField, volumeField;
@@ -642,62 +642,69 @@ public class BSFCgui implements ActionListener {
 	 * loop to calculate mass and velocities
 	 */
 	// TODO: UNITS PROBLEM!!!!
-	//TODO: Moderate and Quick acceleration don't work. Mass used values weird.
+	// TODO: Moderate and Quick acceleration don't work. Mass used values weird.
 	private void velocityLoop(double rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
 		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
-		double Wc = (Tc / .0212);
+		double Wc = (Tc / .0212) * (2 * Math.PI / 60);
 		double deltaT = .1;
 		int sentinel = 1;
-		bsfc = bsfc / 3600000;
-		rpm = rpm * (2 * Math.PI / 60);
-		double deltaV;
-		double finalV = finalSpeed * .000277778;
+		rpm = rpm * (2 * Math.PI / 60); // rad/sec
+		double deltaV; // mi/hr
+		double finalV = finalSpeed;
 		double twoPercent = finalV - (finalV * .02);
-		double currentV = initialSpeed * .000277778;
-		double dist = 0;
-		double massUsed = 0;
-		double deltaMass;
+		double currentV = initialSpeed;
+		double dist = 0; // mi
+		double massUsed = 0; // g
+		double deltaMass; // g
 		int count = 0;
 
 		while (sentinel != -1) {
-			
-			if (twoPercent >= finalSpeed || (currentV) > finalSpeed) {
+			if (twoPercent >= finalSpeed || currentV > finalSpeed) {
 				sentinel = -1;
 			}
-			deltaV = (((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV));
+			// (rad/sec * kgm^2/sec^2) * sec / g*(mi/sec)
+			// radKgm^2/sec / gmi/sec
+			// radKgm^2 * gmi/sec
+			// radKm^2/secmi
+			// 1000(3.8610192e-7 mi^2)/sec mi
+			// 0.00038610191 mi/sec
+			// ~1.404 mi/hr
+			deltaV = ((((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV * .000277778))) * 1.404; // converts
+																												// to
+																												// mi/hr
 			if (deltaV < 0) {
 				deltaV = deltaV * (-1);
 			}
-			dist = (currentV * deltaT);
-			deltaMass = (bsfc * rpm * torque * deltaT)/1000;
+			dist = ((currentV * .000277778) * deltaT); // miles
+			deltaMass = ((bsfc / 360000) * torque * rpm * dist) / currentV; // g
 			massUsed = massUsed + deltaMass;
 			currentV = currentV + deltaV;
-			rpm = grabRpm(currentV) * (2 * Math.PI / 60);
+			rpm = grabRpm(currentV) * ((2 * Math.PI) / 60);
 			torque = grabTorque(currentV);
 			bsfc = grabBsfc(currentV) / 3600000;
 			Tc = getCruiseTorque(finalV, currentV);
-			Wc = Tc / .0212;
+			Wc = Tc / .0212 * ((2 * Math.PI)/60);
 			System.out.println(count);
 			System.out.println("cruiseT: " + Tc);
 			System.out.println("cruiseW: " + Wc);
-			System.out.println("currentV: " + currentV);
+			System.out.println("currentV (mi/hr): " + currentV);
+			System.out.println("finalV (mi/hr): " + finalV);
 			System.out.println("deltaV: " + deltaV);
 			System.out.println("dist: " + dist);
-			System.out.println("deltaMass: " + deltaMass);
-			System.out.println("massUsed: " + massUsed);
+			System.out.println("deltaMass (g): " + deltaMass);
+			System.out.println("massUsed (g): " + massUsed);
 			System.out.println();
 			count++;
-			if(count > 200) {
+			if (count > 200) {
 				sentinel = -1;
 			}
 		}
-		massUsed = massUsed/1000;
 		double volumeConsumed = calculateVolume(massUsed);
-		double mpg = (dist/volumeConsumed)/60;
+		double mpg = (dist / volumeConsumed);
 		System.out.println("Mass consumed   (g): " + massUsed);
 		System.out.println("Volume consumed (gal): " + volumeConsumed);
 		System.out.println("MPG:   " + mpg);
-		massField.setValue(massUsed/1000);
+		massField.setValue(massUsed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
 	}
