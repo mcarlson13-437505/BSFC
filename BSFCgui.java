@@ -635,21 +635,14 @@ public class BSFCgui implements ActionListener {
 	 */
 	private double calculateVolume(double massConsumed) {
 		double poundMass = massConsumed * 0.00220462; // g to lb
-		return (poundMass / 6.183) / 1000;
-	}
-
-	/*
-	 * calculates mpg for the acceleration
-	 */
-	private double calculateMPG(double distance, double volume) {
-		double mpg = distance / volume;
-		return mpg;
+		return (poundMass / 6.183);
 	}
 
 	/*
 	 * loop to calculate mass and velocities
 	 */
 	// TODO: UNITS PROBLEM!!!!
+	//TODO: Moderate and Quick acceleration don't work. Mass used values weird.
 	private void velocityLoop(double rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
 		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
 		double Wc = (Tc / .0212);
@@ -671,7 +664,6 @@ public class BSFCgui implements ActionListener {
 			if (twoPercent >= finalSpeed || (currentV) > finalSpeed) {
 				sentinel = -1;
 			}
-			
 			deltaV = (((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV));
 			if (deltaV < 0) {
 				deltaV = deltaV * (-1);
@@ -679,7 +671,12 @@ public class BSFCgui implements ActionListener {
 			dist = (currentV * deltaT);
 			deltaMass = (bsfc * rpm * torque * deltaT)/1000;
 			massUsed = massUsed + deltaMass;
-
+			currentV = currentV + deltaV;
+			rpm = grabRpm(currentV) * (2 * Math.PI / 60);
+			torque = grabTorque(currentV);
+			bsfc = grabBsfc(currentV) / 3600000;
+			Tc = getCruiseTorque(finalV, currentV);
+			Wc = Tc / .0212;
 			System.out.println(count);
 			System.out.println("cruiseT: " + Tc);
 			System.out.println("cruiseW: " + Wc);
@@ -689,22 +686,18 @@ public class BSFCgui implements ActionListener {
 			System.out.println("deltaMass: " + deltaMass);
 			System.out.println("massUsed: " + massUsed);
 			System.out.println();
-
-			currentV = currentV + deltaV;
-			rpm = grabRpm(currentV) * (2 * Math.PI / 60);
-			torque = grabTorque(currentV);
-			bsfc = grabBsfc(currentV) / 3600000;
-			Tc = getCruiseTorque(finalV, currentV);
-			Wc = Tc / .0212;
 			count++;
+			if(count > 200) {
+				sentinel = -1;
+			}
 		}
-		massUsed = massUsed / 1000;
+		massUsed = massUsed/1000;
 		double volumeConsumed = calculateVolume(massUsed);
-		double mpg = calculateMPG(dist, volumeConsumed);
-		System.out.println("Mass consumed   (lbs): " + massUsed);
+		double mpg = (dist/volumeConsumed)/60;
+		System.out.println("Mass consumed   (g): " + massUsed);
 		System.out.println("Volume consumed (gal): " + volumeConsumed);
-		System.out.println("MPG:                   " + mpg);
-		massField.setValue(massUsed);
+		System.out.println("MPG:   " + mpg);
+		massField.setValue(massUsed/1000);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
 	}
