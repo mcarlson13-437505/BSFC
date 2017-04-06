@@ -25,17 +25,6 @@ public class BSFCgui implements ActionListener {
 	double t1 = 33.35312157, t2 = 28.90603869, t3 = 26.68249726, t4 = 13.34124863, t5 = 31.12958013, t6 = 31.12958013,
 			t7 = 40.02374588, t8 = 15.56479007, t9 = 36.68843373;
 
-	private int[] r30 = { 1193, 1465, 1725 }, r31 = { 1312, 1512, 1478 },
-			r32 = { 1527, 1500, 1439, 1545, 1500, 2502, 1594 }, r33 = { 1674, 1610, 1576, 1980, 1563 },
-			r34 = { 1658, 1600, 1455, 1608, 1639, 1584, 1687, 1416, 1597, 1514, 1591, 1591, 1614, 1605, 1665, 1640,
-					2176, 1555, 1972 },
-			r35 = { 2059, 1668, 2783, 1761, 1386, 2033, 1109, 1229, 1639, 1701, 1635, 1607, 1475, 1708, 1475, 1123,
-					1654, 1660, 1654, 1705, 1656, 1714, 1660, 1704, 1984, 1666, 1656, 1701, 1625, 1867 },
-			r36 = { 1130, 2101, 1700 }, r37 = { 1703, 1812, 1838, 2176, 2134 }, r39 = { 1836, 1438, 1948 },
-			r40 = { 1936, 1902 }, r41 = { 1933 }, r42 = { 1970, 1961, 2076 }, r43 = { 2079, 2433, 2106, 2031 },
-			r44 = { 2105 }, r45 = { 2145, 2149, 2117, 2090 }, r47 = { 2270, 2197, 2265, 2275 }, r48 = { 2334 },
-			r50 = { 2389, 2355 }, r51 = { 2449, 2500 }, r53 = { 2530, 2519, 2509, 2530, 2550 }, r58 = { 2762 };
-
 	private double[] t30 = { 17.7883315, 40.02374588, 106.729989 }, t31 = { 22.23541438, 23.3471851, 41.1355166 },
 			t32 = { 17.7883315, 28.90603869, 36.68843373, 38.91197517, 38.91197517, 102.2829061, 104.5064476 },
 			t33 = { 15.56479007, 21.12364366, 27.79426798, 28.90603869, 106.729989 },
@@ -108,10 +97,9 @@ public class BSFCgui implements ActionListener {
 					JOptionPane.WARNING_MESSAGE);
 			clearButtonAction();
 		}
-		int rpmToUse = grabRpm(initialSpeed);
 		double torqueToUse = grabTorque(initialSpeed);
 		double bsfcToUse = grabBsfc(initialSpeed);
-		velocityLoop(rpmToUse, torqueToUse, bsfcToUse, initialSpeed, finalSpeed);
+		velocityLoop(torqueToUse, bsfcToUse, initialSpeed, finalSpeed);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -236,77 +224,6 @@ public class BSFCgui implements ActionListener {
 					JOptionPane.WARNING_MESSAGE);
 		}
 		return torqueToUse;
-	}
-
-	private int grabRpm(double speed) {
-		int rpmToUse = 0;
-		int[] array = findRpmArray(speed);
-		String choiceSlow = "          Slow";
-		String choiceMod = "          Moderate";
-		String choiceQuick = "          Quick";
-		String choice = (String) torqueDropDown.getSelectedItem();
-		if (choice.equals(choiceSlow)) {
-			rpmToUse = slowAccelerationRpm(array);
-		} else if (choice.equals(choiceMod)) {
-			rpmToUse = moderateAccelerationRpm(array);
-		} else if (choice.equals(choiceQuick)) {
-			rpmToUse = quickAccelerationRpm(array);
-		} else {
-			JOptionPane.showMessageDialog(null, "Invalid acceleration input. Program will re-launch.", "ERROR",
-					JOptionPane.WARNING_MESSAGE);
-		}
-		return rpmToUse;
-	}
-
-	private int quickAccelerationRpm(int[] array) {
-		int valueToUse = max(array);
-		return valueToUse;
-	}
-
-	private int max(int[] array) {
-		int valueToUse = 0;
-		int max = 0;
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] > max) {
-				max = array[i];
-			}
-		}
-		valueToUse = max;
-		return valueToUse;
-	}
-
-	private int moderateAccelerationRpm(int[] array) {
-		int valueToUse = mid(array);
-		return valueToUse;
-	}
-
-	private int mid(int[] array) {
-		int valueToUse = 0;
-		int mid = 0;
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] <= mid || array[i] >= mid) {
-				mid = array[i];
-			}
-		}
-		valueToUse = mid;
-		return valueToUse;
-	}
-
-	private int slowAccelerationRpm(int[] array) {
-		int valueToUse = min(array);
-		return valueToUse;
-	}
-
-	private int min(int[] array) {
-		int valueToUse = 0;
-		int min = 1000000;
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] < min) {
-				min = array[i];
-			}
-		}
-		valueToUse = min;
-		return valueToUse;
 	}
 
 	private double grabBsfc(double speed) {
@@ -466,72 +383,6 @@ public class BSFCgui implements ActionListener {
 		return arrayToUse;
 	}
 
-	private int[] findRpmArray(double speed) {
-		int[] arrayToUse = {};
-		if (speed == 30.0) {
-			arrayToUse = r30;
-		} else if (speed == 31.0) {
-			arrayToUse = r31;
-		} else if (speed == 32.0) {
-			arrayToUse = r32;
-		} else if (speed == 33.0) {
-			arrayToUse = r33;
-		} else if (speed == 34.0) {
-			arrayToUse = r34;
-		} else if (speed == 35.0) {
-			arrayToUse = r35;
-		} else if (speed == 36.0) {
-			arrayToUse = r36;
-		} else if (speed == 37.0) {
-			arrayToUse = r37;
-		} else if (speed == 38.0) {
-			arrayToUse = r39;
-		} else if (speed == 39.0) {
-			arrayToUse = r39;
-		} else if (speed == 40.0) {
-			arrayToUse = r40;
-		} else if (speed == 41.0) {
-			arrayToUse = r41;
-		} else if (speed == 42.0) {
-			arrayToUse = r42;
-		} else if (speed == 43.0) {
-			arrayToUse = r43;
-		} else if (speed == 44.0) {
-			arrayToUse = r44;
-		} else if (speed == 45.0) {
-			arrayToUse = r45;
-		} else if (speed == 46.0) {
-			arrayToUse = r47;
-		} else if (speed == 47.0) {
-			arrayToUse = r47;
-		} else if (speed == 48.0) {
-			arrayToUse = r48;
-		} else if (speed == 49.0) {
-			arrayToUse = r48;
-		} else if (speed == 50.0) {
-			arrayToUse = r50;
-		} else if (speed == 51.0) {
-			arrayToUse = r51;
-		} else if (speed == 53.0) {
-			arrayToUse = r53;
-		} else if (speed == 54.0) {
-			arrayToUse = r53;
-		} else if (speed == 55.0) {
-			arrayToUse = r53;
-		} else if (speed == 56.0) {
-			arrayToUse = r58;
-		} else if (speed == 57.0) {
-			arrayToUse = r58;
-		} else if (speed == 58.0) {
-			arrayToUse = r58;
-		} else if (speed == 59.0) {
-			arrayToUse = r58;
-		} else if (speed == 60.0) {
-			arrayToUse = r58;
-		}
-		return arrayToUse;
-	}
-
 	private double moderateAcceleration(double[] array) {
 		double valueToUse = mid(array);
 		return valueToUse;
@@ -640,16 +491,28 @@ public class BSFCgui implements ActionListener {
 	/*
 	 * loop to calculate mass and velocities
 	 */
-	private void velocityLoop(double rpm, double torque, double bsfc, double initialSpeed, double finalSpeed) {
-		double Tc = getCruiseTorque(initialSpeed, finalSpeed);
-		double Wc = (Tc / .0212) * (2 * Math.PI / 60);
-		double deltaT = .1;
+	private void velocityLoop(double torque, double bsfc, double initialSpeed, double finalSpeed) {
+		double currentV = initialSpeed;
+		double rpm = currentV / .0212;
+		double Tc = getCruiseTorque(currentV);
+		double Wc = rpm * (2 * Math.PI / 60);
+		double deltaT = 0;
+		String choiceSlow = "          Slow";
+		String choiceMod = "          Moderate";
+		String choiceQuick = "          Quick";
+		String choice = (String) torqueDropDown.getSelectedItem();
+		if (choice.equals(choiceSlow)) {
+			deltaT = 1;
+		} else if (choice.equals(choiceMod)) {
+			deltaT = .5;
+		} else if (choice.equals(choiceQuick)) {
+			deltaT = .25;
+		} 
 		int sentinel = 1;
 		rpm = rpm * (2 * Math.PI / 60); // rad/sec
 		double deltaV; // mi/hr
 		double finalV = finalSpeed;
 		double twoPercent = finalV - (finalV * .02);
-		double currentV = initialSpeed;
 		double dist = 0; // mi
 		double massUsed = 0; // g
 		double deltaMass; // g
@@ -659,9 +522,7 @@ public class BSFCgui implements ActionListener {
 			if (twoPercent >= finalSpeed || currentV > finalSpeed) {
 				sentinel = -1;
 			}
-			deltaV = ((((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV * .000277778))) * 1.404; // converts
-																													// to
-																													// mi/hr
+			deltaV = ((((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV * .000277778))) * 1.404; 
 			if (deltaV < 0) {
 				deltaV = deltaV * (-1);
 			}
@@ -669,16 +530,6 @@ public class BSFCgui implements ActionListener {
 			deltaMass = ((bsfc / 360000) * torque * rpm * dist) / currentV; // g
 			massUsed = massUsed + deltaMass;
 			currentV = currentV + deltaV;
-//
-//			System.out.println(count);
-//			System.out.println("cruiseT: " + Tc);
-//			System.out.println("cruiseW: " + Wc);
-//			System.out.println("currentV (mi/hr): " + currentV);
-//			System.out.println("deltaV: " + deltaV);
-//			System.out.println("dist: " + dist);
-//			System.out.println("deltaMass (g): " + deltaMass);
-//			System.out.println("massUsed (g): " + massUsed);
-//			System.out.println();
 			count++;
 			if (count > 200) {
 				sentinel = -1;
@@ -689,9 +540,6 @@ public class BSFCgui implements ActionListener {
 		massUsed = massUsed * 100;
 		double volumeConsumed = (massUsed * 0.00220462) / 6.183;
 		double mpg = (dist / volumeConsumed);
-//		System.out.println("Mass consumed   (g): " + massUsed);
-//		System.out.println("Volume consumed (gal): " + volumeConsumed);
-//		System.out.println("MPG:   " + mpg);
 		massField.setValue(massUsed);
 		volumeField.setValue(volumeConsumed);
 		mpgField.setValue(mpg);
@@ -701,25 +549,27 @@ public class BSFCgui implements ActionListener {
 	 * cruising torque solve y = .0212x where y = torque, x = rpm
 	 */
 
-	private double getCruiseTorque(double initialSpeed, double finalSpeed) {
+	private double getCruiseTorque(double currentV) {
 		double t = 0;
-		if (initialSpeed == 32 || finalSpeed == 32) {
+		double fivePercentA = currentV + (currentV * .05);
+		double fivePercentB = currentV - (currentV * .05);		
+		if (currentV == 32) {
 			t = t1;
-		} else if (initialSpeed == 34 || finalSpeed == 34) {
+		} else if (currentV == 34 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t2;
-		} else if (initialSpeed == 35 || finalSpeed == 35) {
+		} else if (currentV == 35 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t3;
-		} else if (initialSpeed == 43 || finalSpeed == 43) {
+		} else if (currentV == 43 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t5;
-		} else if (initialSpeed == 37 || finalSpeed == 37) {
+		} else if (currentV == 37 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t4;
-		} else if (initialSpeed == 45 || finalSpeed == 45) {
+		} else if (currentV == 45 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t6;
-		} else if (initialSpeed == 48 || finalSpeed == 48) {
+		} else if (currentV == 48 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t7;
-		} else if (initialSpeed == 51 || finalSpeed == 51) {
+		} else if (currentV == 51 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t8;
-		} else if (initialSpeed == 58 || finalSpeed == 58) {
+		} else if (currentV == 58 || fivePercentB <= currentV || fivePercentA >= currentV) {
 			t = t9;
 		} else {
 			t = 31.6;
