@@ -481,12 +481,12 @@ public class BSFCgui implements ActionListener {
 		BSFCgui gui = new BSFCgui();
 	}
 
-//	/*
-//	 * calculates volume of fuel consumed during acceleration
-//	 */
-//	private double calculateVolume(double massConsumed) {
-//		return (massConsumed / 6.183); // lb/gal
-//	}
+	// /*
+	// * calculates volume of fuel consumed during acceleration
+	// */
+	// private double calculateVolume(double massConsumed) {
+	// return (massConsumed / 6.183); // lb/gal
+	// }
 
 	/*
 	 * loop to calculate mass and velocities
@@ -507,7 +507,7 @@ public class BSFCgui implements ActionListener {
 			deltaT = .5;
 		} else if (choice.equals(choiceQuick)) {
 			deltaT = .25;
-		} 
+		}
 		int sentinel = 1;
 		rpm = rpm * (2 * Math.PI / 60); // rad/sec
 		double deltaV; // mi/hr
@@ -522,10 +522,12 @@ public class BSFCgui implements ActionListener {
 			if (twoPercent >= finalSpeed || currentV > finalSpeed) {
 				sentinel = -1;
 			}
-			deltaV = ((((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV * .000277778))) * 1.404; 
-			if (deltaV < 0) {
-				deltaV = deltaV * (-1);
-			}
+			deltaV = ((((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV * .000277778))) * 1.404;
+			// if (deltaV < 0) {
+			// deltaV = deltaV * (-1);
+			// }
+			// TODO: remove ANY data points <= cruising torque
+			// TODO: check low and middle torques to see if they are below cruising
 			dist = dist + ((currentV * .000277778) * deltaT); // mi
 			deltaMass = ((bsfc / 360000) * torque * rpm * dist) / currentV; // g
 			massUsed = massUsed + deltaMass;
@@ -552,7 +554,7 @@ public class BSFCgui implements ActionListener {
 	private double getCruiseTorque(double currentV) {
 		double t = 0;
 		double fivePercentA = currentV + (currentV * .05);
-		double fivePercentB = currentV - (currentV * .05);		
+		double fivePercentB = currentV - (currentV * .05);
 		if (currentV == 32) {
 			t = t1;
 		} else if (currentV == 34 || fivePercentB <= currentV || fivePercentA >= currentV) {
