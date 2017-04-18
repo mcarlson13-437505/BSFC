@@ -78,7 +78,7 @@ public class BSFCgui implements ActionListener {
 	private void valueGrabber() {
 		double initialSpeed = (long) initialSpeedField.getValue();
 		double finalSpeed = (long) finalSpeedField.getValue();
-		if (initialSpeed < 30 || finalSpeed > 60 || initialSpeed > finalSpeed) {
+		if (initialSpeed < 30 || finalSpeed > 60 || initialSpeed > finalSpeed || initialSpeed == finalSpeed) {
 			JOptionPane.showMessageDialog(null, "Invalid speed input. Program will re-launch.", "ERROR",
 					JOptionPane.WARNING_MESSAGE);
 			clearButtonAction();
@@ -475,7 +475,6 @@ public class BSFCgui implements ActionListener {
 		int sentinel = 1;
 		rpm = rpm * (2 * Math.PI / 60); // rad/sec
 		double deltaV; // mi/hr
-		double finalV = finalSpeed;
 		double dist = 0; // mi
 		double massUsed = 0; // g
 		double deltaMass; // g
@@ -486,17 +485,10 @@ public class BSFCgui implements ActionListener {
 				torque = Tc;
 			}
 			deltaV = ((((rpm * torque) - (Wc * Tc)) * deltaT) / (1060045 * (currentV * .000277778))) * 1.404;
-			dist = dist + ((currentV * .000277778) * deltaT); // mi
-			deltaMass = ((bsfc / 360000) * torque * rpm * dist) / currentV; // g
+			dist = dist + ((currentV * .000277778) * deltaT);
+			deltaMass = ((bsfc / 360000) * torque * rpm * dist) / currentV;
 			massUsed = massUsed + deltaMass;
 			currentV = currentV + deltaV;
-			System.out.println("CurrentV: " + currentV);
-			System.out.println("deltaV: " + deltaV);
-			System.out.println("Final V: " + finalV);
-			System.out.println("Dist: " + dist + "\n");
-			System.out.println("Torque: " + torque);
-			System.out.println("Tc: " + Tc);
-			System.out.println("Count: " + count);
 			count++;
 			if (count > 200) {
 				sentinel = -1;
@@ -506,8 +498,10 @@ public class BSFCgui implements ActionListener {
 				sentinel = -1;
 			}
 		}
+		System.out.println("Dist after loop (mi): " + dist);
 		massUsed = massUsed * 100;
 		double volumeConsumed = (massUsed * 0.00220462) / 6.183;
+		System.out.println("Gallons used: " + volumeConsumed + "\n");
 		double mpg = (dist / volumeConsumed);
 		massField.setValue(massUsed);
 		volumeField.setValue(volumeConsumed);
